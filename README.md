@@ -1,8 +1,8 @@
-# repository
+# Laravel Filter
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Software License][ico-license]](LICENSE.md)
-[![Latest Stable Version](http://img.shields.io/packagist/v/czim/laravel-repository.svg)](https://packagist.org/packages/czim/laravel-filter)
+[![Latest Stable Version](http://img.shields.io/packagist/v/czim/laravel-filter.svg)](https://packagist.org/packages/czim/laravel-filter)
 
 Configurable and modular Filter setup for Laravel. This is intended to make it easy to search for and filter by records using a typical web shop filter.
 For example, if you want to filter a catalog of products by product attributes, brand names, product lines and so forth.
