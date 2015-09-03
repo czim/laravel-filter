@@ -34,6 +34,7 @@ Simply extend the (abstract) filter class of your choice, either `Czim\Filter\Fi
 
 Each has abstract methods that must be provided for the class to work. Once they are all set (see below), you can simply apply filter settings to a query:
  
+``` php
     $filterValues = [ 'attributename' => 'value', ... ];
 
     $filter = new SomeFilter($filterValues);
@@ -46,11 +47,14 @@ Each has abstract methods that must be provided for the class to work. Once they
     
     // normal get() call on the now filtered query
     $results = $filteredQuery->get();
-    
+```
+
 A `CountableFilter` has an additional method that may be called:
- 
+
+``` php
     $countResults = $filter->count();
-    
+```
+
 You can find more about countable filters below.
 
 
@@ -69,6 +73,7 @@ In you extension of the `Filter` class, override the property like so in order t
 
 Your `FilterData` class should then look something like this:
 
+``` php
     class FilterDataClass extends \Czim\FilterData
     {
         // Validation rules for filter attributes passed in
@@ -88,13 +93,16 @@ Your `FilterData` class should then look something like this:
             'active' => true,
         ];
     }
+```
 
 Then, passing array(able) data into the constructor of your filter will automatically instantiate that FilterData class for you.
 If it is an (unmodified) extension of `Czim\FilterData`, it will also validate the data and throw an exception if the data does not match the `$rules` defined in your Data class.
 
 Alternatively, you can make your own implementation of the provided `FilterDataInterface` and pass it into the Filter directly.
 
+``` php
     $filter = new YourFilter( new YourFilterData($someData) );
+```
 
 All it needs to do is implement the interface; if you pass in data this way, the data will be set without any further checks or validation, unless you handle it in your FilterData implementation yourself.
 
@@ -104,8 +112,92 @@ All it needs to do is implement the interface; if you pass in data this way, the
 Basic Filters take a query and apply filter parameters to it, before handing it back.
 (Note that the query object passed in will be modified; it is not cloned in the Filter before making modifications).
 
-...
+For example, if you'd do the following:
 
+``` php
+    $query = SomeModel::where('some_column', 1);
+     
+    $query = (new YourFilter([ 'name' => 'random' ])->apply($query);
+     
+    echo $query->toSql();
+```
+
+You might expect the result to be something like `select * from some_models where some_column = 1 and name LIKE '%random%'`.
+
+What a filter exactly does with the filter data you pass into its constructor must be defined in your implementation.
+This may be done in two main ways, which can be freely combined:
+
+*   By defining *strategies* (overriding the public `strategies()` method)
+*   By overriding the `applyParameter()` method as a fallback option
+
+### Strategies and ParameterFilters
+
+You can define strategies for each filter parameter by adding a strategies method to your filter as follows:
+
+``` php
+    protected function strategies()
+    {
+        return [
+            'parameter_name_here' => new \Czim\Filter\ParameterFilters\SimpleString(),
+            'another_parameter'   => \Czim\Filter\ParameterFilters\SimpleString::class,
+            'yet_another'         => function($name, $value, $query) {
+                                        return $query->where('some_column', '>', $value);
+                                     },
+            'and_another'         => [ $this, 'someMethodYouDefined' ],
+        ];
+    }
+```
+
+If filter data is passed into the class with the same keyname as a strategy, that strategy method will be invoked.
+As shown above, there are different ways to provide a callable method for filters, but all methods mean passing data to a function that takes these parameters:
+
+``` php
+    /**
+     * @param string          $name     the keyname of the parameter/strategy
+     * @param mixed           $value    the value for this parameter set in the filter data
+     * @param EloquentBuilder $query
+     * @param FilterInterface $filter   the filter from which the strategy was invoked
+     */
+    public function apply($name, $value, $query);
+```
+
+A `ParameterFilter` is a class (any that implements the `ParameterFilterInterface`) which may be set as a filter strategy.
+The `apply()` method on this class will be called when the filter is applied.
+If the ParameterFilter is given as a string for the strategy, it will be instantiated at the moment the filter is applied.
+
+Strategies may also be defined as closures or arrays (so long as they may be fed into a `call_user_func()`).
+The method called by this will receive the four parameters noted above.
+ 
+Only if no strategy has been defined for a parameter, the callback method `applyParameter()` will be called on the filter itself.
+By default, an exception will occur.
+
+
+### The fallback option: applyParameter()
+
+If you prefer, you can also use the fallback method to handle any or all of the appliccable parameters.
+Simply add the following method to your filter class:
+
+``` php
+    protected function applyParameter($name, $value, $query)
+    {
+        switch ($name) {
+        
+            case 'parameter_name_here':
+                
+                // your implementation of the filter ...
+                return $query;
+                
+            ...
+        }
+        
+        // as a safeguard, you can call the parent method,
+        // which will throw exceptions for unhandled parameters
+        parent::applyParameter($name, $value, $query);
+    }
+```
+
+You can freely combine this approach with the strategy definitions mentioned above.
+The only limitation is that when there is a strategy defined for a parameter, the `applyParameter()` fallback will not be called for it.
 
 
 ### Countable Filters
@@ -126,7 +218,7 @@ The counting strategies are similarly configurable/implementable as filtering st
 The return value for `CountableFilter::count()` is an instance of `Czim\CountableResults`, which is basically a standard Laravel `Collection` instance.
 
 
-### ParameterFilters
+
 
 ### ParameterCounters
 
@@ -135,6 +227,11 @@ Just like ParameterFilters for `Filter`, ParameterCounters can be used as 'plugi
 
 ### Global Filter Settings
 
+
+## Examples
+
+To Do: add some example code in a separate .md file
+include full classes for Filter and CountableFilter
 
 ## Configuration
 No configuration is required to start using the filter. You use it by extending an abstract filter class of your choice. 
