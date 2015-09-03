@@ -144,9 +144,6 @@ No configuration is required to start using the filter. You use it by extending 
 
 Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
-## Security
-
-If you discover any security related issues, please email coen@pixelindustries.com instead of using the issue tracker.
 
 ## Credits
 
