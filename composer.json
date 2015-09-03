@@ -1,0 +1,48 @@
+{
+    "name": "czim/laravel-filter",
+    "description": "Filter for Laravel Eloquent queries, with support for modular filter building",
+    "keywords": [
+        "laravel",
+        "filter",
+        "filters",
+        "eloquent",
+        "database"
+    ],
+    "homepage": "https://github.com/czim/laravel-filter",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Coen Zimmerman",
+            "email": "coen@pixelindustries.com",
+            "homepage": "http://www.pixelindustries.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php" : ">=5.4.0",
+        "illuminate/support": "5.*",
+        "illuminate/database": "5.*",
+        "phpextra/enum": "dev-master"
+    },
+    "require-dev": {
+        "phpunit/phpunit" : "4.*",
+        "scrutinizer/ocular": "~1.1",
+        "orchestra/testbench": "~3.0",
+        "dimsav/laravel-translatable": "~5.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Czim\\Filter\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Czim\\Filter\\Test\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

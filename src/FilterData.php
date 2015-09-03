@@ -1,0 +1,137 @@
+<?php
+namespace Czim\Filter;
+
+use Czim\Filter\Exceptions\FilterDataValidationFailedException;
+use Illuminate\Contracts\Support\Arrayable;
+
+/**
+ * Data object that have the settings that Filters need to apply
+ */
+class FilterData implements Contracts\FilterDataInterface, Contracts\ValidatableTraitInterface, Arrayable
+{
+    use Traits\Validatable;
+
+    /**
+     * Validatable filter data: used by ValidatableTrait
+     *
+     * @var array   associative
+     */
+    protected $attributes = [];
+
+    /**
+     * Validation rules for filter
+     *
+     * @var array
+     */
+    protected $rules = [];
+
+    /**
+     * Default values. Anything NOT listed here will NOT be applied in queries.
+     * Make sure there are defaults for every filterable attribute.
+     *
+     * @var array   associative
+     */
+    protected $defaults = [];
+
+
+    /**
+     * Constructor: validate filter data
+     *
+     * @param array|Arrayable $attributes
+     * @param array|Arrayable $defaults     if provided, overrides internal defaults
+     */
+    public function __construct($attributes, $defaults = null)
+    {
+        // store attributes as an array
+        if ( ! is_array($attributes)) {
+
+            if (is_a($attributes, Arrayable::class)) {
+
+                $attributes = $attributes->toArray();
+
+            } else {
+                // guarantee it will be an array
+                $attributes = [ $attributes ];
+            }
+        }
+
+        $this->attributes = array_merge($this->defaults, $attributes);
+
+        // validate the attributes passed in
+        $this->validateAttributes();
+
+        // if default overrides are provided, save them
+        if ( ! empty($defaults)) {
+
+            if ( ! is_array($defaults)) $defaults = $defaults->toArray();
+
+            $this->defaults = $defaults;
+        }
+    }
+
+
+    /**
+     * Get the instance as an array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return $this->attributes;
+    }
+
+    /**
+     * Returns the default values for each applicable attribute
+     *
+     * @return array
+     */
+    public function getDefaults()
+    {
+        return $this->defaults;
+    }
+
+    /**
+     * Gets the attribute names which may be applied
+     *
+     * @return array
+     */
+    public function getApplicableAttributes()
+    {
+        return array_keys($this->defaults);
+    }
+
+    /**
+     * Validates currently set attributes (not including defaults)
+     * against the given validation rules
+     */
+    protected function validateAttributes()
+    {
+        if (empty($this->rules)) return;
+
+        if ( ! $this->validate()) {
+
+            throw (new FilterDataValidationFailedException)->setMessages($this->messages());
+        }
+    }
+
+    /**
+     * Gets the value for a parameter
+     *
+     * @param $name
+     * @return mixed
+     */
+    public function getParameterValue($name)
+    {
+        return (isset($this->attributes[$name])) ? $this->attributes[$name] : null;
+    }
+
+    /**
+     * Getter for attributes
+     *
+     * @return array
+     */
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
+}
