@@ -44,6 +44,13 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
     protected $countStrategies = [];
 
     /**
+     * List of countables that should not be included in getCount() results.
+     *
+     * @var array
+     */
+    protected $ignoreCountables = [];
+
+    /**
      * Returns new base query object to build countable query on.
      * This will be called for each countable parameter, and could be
      * something like: EloquentModelName::query();
@@ -52,6 +59,7 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
      * @return EloquentBuilder
      */
     abstract protected function getCountableBaseQuery($parameter = null);
+
 
     /**
      * Constructs the relevant FilterData if one is not injected
@@ -87,18 +95,34 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
     }
 
     /**
+     * Returns a list of the countable parameters that are not ignored
+     *
+     * @return array
+     */
+    protected function getActiveCountables()
+    {
+        return array_diff($this->getCountables(), $this->ignoreCountables);
+    }
+
+    /**
      * Gets alternative counts per (relevant) attribute for the filter data.
      *
+     * @param array $countables     overrides ignoredCountables
      * @return CountableResults
      * @throws ParameterStrategyInvalidException
      */
-    public function getCounts()
+    public function getCounts($countables = [])
     {
         $counts = new CountableResults;
 
         $strategies = $this->buildCountableStrategies();
 
-        foreach ($this->getCountables() as $parameterName) {
+        // determine which countables to count for
+        $countables = ( ! empty($countables))
+                        ?   array_intersect($this->getCountables(), $countables)
+                        :   $this->getActiveCountables();
+
+        foreach ($countables as $parameterName) {
 
             $strategy = isset($strategies[$parameterName]) ? $strategies[$parameterName] : null;
 
@@ -197,4 +221,35 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
 
         return $this->countStrategies;
     }
+
+    /**
+     * Disables one or more countables when getCounts() is invoked
+     *
+     * @param string|array $countable
+     * @return $this
+     */
+    public function ignoreCountable($countable)
+    {
+        if ( ! is_array($countable)) $countable = [ $countable];
+
+        $this->ignoreCountables = array_merge($this->ignoreCountables, $countable);
+
+        return $this;
+    }
+
+    /**
+     * Re-enables one or more countables when getCounts() is invoked
+     *
+     * @param string|array $countable
+     * @return $this
+     */
+    public function unignoreCountable($countable)
+    {
+        if ( ! is_array($countable)) $countable = [ $countable];
+
+        $this->ignoreCountables = array_diff($this->ignoreCountables, $countable);
+
+        return $this;
+    }
+
 }

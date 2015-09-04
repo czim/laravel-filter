@@ -150,4 +150,56 @@ class CountableFilterTest extends TestCase
         );
     }
 
+
+    // --------------------------------------------
+    //      ignored countables
+    // --------------------------------------------
+
+    /**
+     * @test
+     */
+    function it_returns_only_unignored_countable_results()
+    {
+        $filter = new TestCountableFilter([]);
+
+        $filter->ignoreCountable('relateds');
+
+        $counts = $filter->getCounts();
+
+        $this->assertCount(1, $counts, "getCounts() results should have 1 item (the other is ignored)");
+
+        // position 14 appears twice, 0 and 1 once
+        $this->assertEquals(
+            [ 0 => 1,  1 => 1, 14 => 2 ],
+            $counts->get('position')->toArray(),
+            "getCounts() result should be correct position only"
+        );
+
+
+        // after unignoring, all countables should be there
+        $filter->unignoreCountable( ['relateds'] );
+
+        $counts = $filter->getCounts();
+
+        $this->assertCount(2, $counts, "getCounts() results should have 2 items after unignoring countable");
+    }
+
+    /**
+     * @test
+     */
+    function it_returns_counts_for_selected_keys_only()
+    {
+        $filter = new TestCountableFilter([]);
+
+        $counts = $filter->getCounts([ 'position' ]);
+
+        $this->assertCount(1, $counts, "getCounts() results should have 1 item (the other is ignored)");
+
+        // position 14 appears twice, 0 and 1 once
+        $this->assertEquals(
+            [ 0 => 1,  1 => 1, 14 => 2 ],
+            $counts->get('position')->toArray(),
+            "getCounts() result should be correct position only"
+        );
+    }
 }
