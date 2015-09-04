@@ -10,6 +10,7 @@ class TestSimpleModel extends Model
         'second_field',
         'test_related_model_id',
         'name',
+        'position',
         'active',
     ];
 
