@@ -3,7 +3,7 @@ namespace Czim\Filter\Contracts;
 
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
-interface ParameterCounterInterface extends FilterInterface
+interface ParameterCounterInterface
 {
     /**
      * Returns the count for a countable parameter, given the query provided
