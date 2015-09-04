@@ -7,7 +7,7 @@ use DB;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
 /**
- * Counts different values for a single integer column with configurable aliases.
+ * Counts different values for a single integer foreign key column with configurable aliases.
  *
  * If no parameters are given on construction, it will assume an id field with the Laravel
  * naming convention, for a table-name parameter name:
@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
  *      parameter name: 'brands'
  *      result: counts 'brand_id'
  */
-class SimpleInteger implements ParameterCounterInterface
+class SimpleBelongsTo implements ParameterCounterInterface
 {
     /**
      * @var string
@@ -71,18 +71,19 @@ class SimpleInteger implements ParameterCounterInterface
     {
         // if the columnname is not set, assume an id field based on a table name
         $columnName  = (empty($this->columnName))
-                            ?   $columnName = str_singular($name) . '_id'
-                            :   $this->columnName;
+            ?   $columnName = str_singular($name) . '_id'
+            :   $this->columnName;
 
         if ( ! $this->includeEmpty) {
             $query->whereNotNull($columnName);
         }
 
         return $query->select(
-                        "{$columnName} AS {$this->columnAlias}",
-                        DB::raw("{$this->countRaw} AS {$this->countAlias}")
-                     )
-                     ->groupBy($columnName)
-                     ->lists($this->countAlias, $this->columnAlias);
+            "{$columnName} AS {$this->columnAlias}",
+            DB::raw("{$this->countRaw} AS {$this->countAlias}")
+        )
+            ->groupBy($columnName)
+            ->lists($this->countAlias, $this->columnAlias);
     }
 }
+
