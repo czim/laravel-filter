@@ -8,6 +8,7 @@ use Czim\Filter\Exceptions\FilterParameterUnhandledException;
 use Czim\Filter\Exceptions\ParameterStrategyInvalidException;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use ReflectionClass;
 
 /**
  * The point is to get an overview of things that may be alternatively filtered
@@ -161,23 +162,32 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
     {
         foreach ($this->countStrategies as &$strategy) {
 
+            // check if the strategy is a string that should be instantiated as a class
             if (is_string($strategy)) {
 
                 try {
+
+                    $reflection = new ReflectionClass($strategy);
+
+                    if ( ! $reflection->IsInstantiable()) {
+                        throw new ParameterStrategyInvalidException("Uninstantiable string provided as countStrategy for '{$strategy}'");
+                    }
+
                     $strategy = new $strategy();
 
                 } catch (\Exception $e) {
 
                     throw new ParameterStrategyInvalidException(
-                        "Uninstantiable string provided as strategy for '{$strategy}'",
+                        "Exception thrown while trying to reflect or instantiate string provided as countStrategy for '{$strategy}'",
                         0, $e
                     );
                 }
 
+                // check if it is of the correct type
                 if ( ! is_a($strategy, ParameterCounterInterface::class)) {
 
                     throw new ParameterStrategyInvalidException(
-                        "Instantiated string provided is not a ParameterCounter: '" . get_class($strategy) . "'"
+                        "Instantiated string provided is not a ParameterFilter: '" . get_class($strategy) . "'"
                     );
                 }
             }
