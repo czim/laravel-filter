@@ -79,7 +79,7 @@ In you extension of the `Filter` class, override the property like so in order t
 Your `FilterData` class should then look something like this:
 
 ``` php
-    class FilterDataClass extends \Czim\FilterData
+    class FilterDataClass extends \Czim\Filter\FilterData
     {
         // Validation rules for filter attributes passed in
         protected $rules = [
@@ -260,6 +260,19 @@ Strategies may be defined for the effects of `count()` per parameter for your Co
 
 The same methods for defining strategies are available as with the `strategies()` methods above: instances (of ParameterCounters in this case), strings, closures and arrays. 
 
+The fallback for parameters without defined strategies is `countParameter()`:
+
+``` php
+    /**
+     * @param string          $parameter countable name
+     * @param EloquentBuilder $query
+     */
+    protected function countParameter($parameter, $query)
+    {
+        // your implementation for each $parameter name 
+    }
+```
+
 
 ### ParameterCounters
 
@@ -333,8 +346,7 @@ If a setting has not been defined, the `setting()` method for it will return `nu
 
 ## Examples
 
-To Do: add some example code in a separate .md file
-include full classes for Filter and CountableFilter
+Here are [some examples](EXAMPLES.md) of using the Filter and CountableFilter classes.
 
 
 ## Contributing
