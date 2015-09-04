@@ -41,4 +41,20 @@ interface FilterInterface
      */
     public function addJoin($key, array $parameters);
 
+    /**
+     * Getter for settings
+     *
+     * @param string $name
+     * @return mixed
+     */
+    public function setting($name);
+
+    /**
+     * Returns parameter value set in filter data
+     *
+     * @param string $name
+     * @return mixed
+     */
+    public function parameterValue($name);
+
 }

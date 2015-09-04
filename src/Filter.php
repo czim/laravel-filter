@@ -138,6 +138,18 @@ class Filter implements Contracts\FilterInterface
     }
 
     /**
+     * Returns parameter value set in filter data
+     * Convenience method
+     *
+     * @param string $name
+     * @return mixed
+     */
+    public function parameterValue($name)
+    {
+        return $this->data->getParameterValue($name);
+    }
+
+    /**
      * Applies the loaded FilterData to a query (builder)
      *
      * @param Model|EloquentBuilder $query
@@ -225,7 +237,7 @@ class Filter implements Contracts\FilterInterface
 
             // get the value for the filter parameter
             // and if it is empty, we're not filtering by it and should skip it
-            $parameterValue = $this->data->getParameterValue($parameterName);
+            $parameterValue = $this->parameterValue($parameterName);
 
             if ($parameterValue !== false && empty($parameterValue)) continue;
 
@@ -279,7 +291,7 @@ class Filter implements Contracts\FilterInterface
 
             if ( ! is_string($strategy) || $strategy !== static::SETTING) continue;
 
-            $this->settings[ $setting ] = $this->data->getParameterValue($setting);
+            $this->settings[ $setting ] = $this->parameterValue($setting);
         }
     }
 
