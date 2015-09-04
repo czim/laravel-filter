@@ -93,38 +93,6 @@ class FilterTest extends TestCase
 
     /**
      * @test
-     * @expectedException \Czim\Filter\Exceptions\FilterDataValidationFailedException
-     */
-    function it_throws_an_exception_if_invalid_data_is_passed_in()
-    {
-
-        // see if we get the messages correctly
-        try {
-            new TestFilter([
-                'name'          => 'some name',
-                'relateds'      => 'string which should be an array',
-                'position'      => 'string which should be an integer',
-                'with_inactive' => 'not even a boolean here',
-            ]);
-        } catch (\Czim\Filter\Exceptions\FilterDataValidationFailedException $e) {
-
-            $messages = $e->getMessages();
-
-            $this->assertInstanceOf(MessageBag::class, $messages, "Exception getMessages is not a MessageBag");
-            $this->assertCount(3, $messages, "Exception getMessages should have 3 messages");
-        }
-
-        // throw the exception, but don't catch it this time
-        new TestFilter([
-            'name'          => 'some name',
-            'relateds'      => 'string which should be an array',
-            'position'      => 'string which should be an integer',
-            'with_inactive' => 'not even a boolean here',
-        ]);
-    }
-
-    /**
-     * @test
      */
     function it_can_be_instantiated_with_a_filter_data_object()
     {
@@ -192,6 +160,9 @@ class FilterTest extends TestCase
             $filter->setting('some_setting'),
             "Setting that was set did not have correct value"
         );
+
+        // returns null if never defined
+        $this->assertNull($filter->setting('never_defined_this_key_at_all'), "Undefined settings should return null");
     }
 
     /**
@@ -276,8 +247,16 @@ class FilterTest extends TestCase
         // simple single filter
         $result = (new TestFilter([ 'name' => 'special' ]))->apply(TestSimpleModel::query())->get();
 
-        $this->assertCount(1, $result, "Count for single filter parameter (loosy string, strategy parameterfilter) incorrect");
-        $this->assertEquals('1337', $result->first()->{self::UNIQUE_FIELD}, "Result incorrect for single filter parameter");
+        $this->assertCount(
+            1,
+            $result,
+            "Count for single filter parameter (loosy string, strategy parameterfilter) incorrect"
+        );
+        $this->assertEquals(
+            '1337',
+            $result->first()->{self::UNIQUE_FIELD},
+            "Result incorrect for single filter parameter"
+        );
 
         // double filter, with relation id parameterfilter
         $result = (new TestFilter([
@@ -286,7 +265,11 @@ class FilterTest extends TestCase
             'with_inactive' => true,
         ]))->apply(TestSimpleModel::query())->get();
 
-        $this->assertCount(2, $result, "Count for multiple filter parameters (loosy string and relation ids, and inactive) incorrect");
+        $this->assertCount(
+            2,
+            $result,
+            "Count for multiple filter parameters (loosy string and relation ids, and inactive) incorrect"
+        );
     }
 
     /**
@@ -294,10 +277,19 @@ class FilterTest extends TestCase
      */
     function it_applies_parameters_by_strategy_of_instantiated_parameter_filter()
     {
-        $result = (new TestFilter([ 'parameter_filter_instance' => 'special name' ]))->apply(TestSimpleModel::query())->get();
+        $result = (new TestFilter([ 'parameter_filter_instance' => 'special name' ]))
+                    ->apply(TestSimpleModel::query())->get();
 
-        $this->assertCount(1, $result, "Count for single filter parameter incorrect (exact string, strategy parameterfilter)");
-        $this->assertEquals('1337', $result->first()->{self::UNIQUE_FIELD}, "Result incorrect for single filter parameter (exact string, strategy parameterfilter)");
+        $this->assertCount(
+            1,
+            $result,
+            "Count for single filter parameter incorrect (exact string, strategy parameterfilter)"
+        );
+        $this->assertEquals(
+            '1337',
+            $result->first()->{self::UNIQUE_FIELD},
+            "Result incorrect for single filter parameter (exact string, strategy parameterfilter)"
+        );
     }
 
     /**
@@ -305,10 +297,19 @@ class FilterTest extends TestCase
      */
     function it_applies_parameters_by_strategy_of_instantiable_parameter_filter_class_string()
     {
-        $result = (new TestFilter([ 'parameter_filter_string' => 'ignored, hardcoded test filter' ]))->apply(TestSimpleModel::query())->get();
+        $result = (new TestFilter([ 'parameter_filter_string' => 'ignored, hardcoded test filter' ]))
+                    ->apply(TestSimpleModel::query())->get();
 
-        $this->assertCount(1, $result, "Count for single filter parameter incorrect (strategy parameterfilter by string)");
-        $this->assertEquals('1337', $result->first()->{self::UNIQUE_FIELD}, "Result incorrect for single filter parameter (strategy parameterfilter by string)");
+        $this->assertCount(
+            1,
+            $result,
+            "Count for single filter parameter incorrect (strategy parameterfilter by string)"
+        );
+        $this->assertEquals(
+            '1337',
+            $result->first()->{self::UNIQUE_FIELD},
+            "Result incorrect for single filter parameter (strategy parameterfilter by string)"
+        );
     }
 
     /**
@@ -317,23 +318,89 @@ class FilterTest extends TestCase
     function it_applies_parameters_by_strategy_of_closure()
     {
         // closure as anonymous function
-        $result = (new TestFilter([ 'closure_strategy' => [ 'special name', 3 ] ]))->apply(TestSimpleModel::query())->get();
+        $result = (new TestFilter([ 'closure_strategy' => [ 'special name', 3 ] ]))
+                    ->apply(TestSimpleModel::query())->get();
 
-        $this->assertCount(1, $result, "Count for single filter parameter incorrect (strategy closure with parameters)");
-        $this->assertEquals('1337', $result->first()->{self::UNIQUE_FIELD}, "Result incorrect for single filter parameter (strategy closure with parameters)");
+        $this->assertCount(
+            1,
+            $result,
+            "Count for single filter parameter incorrect (strategy closure with parameters)"
+        );
+        $this->assertEquals(
+            '1337',
+            $result->first()->{self::UNIQUE_FIELD},
+            "Result incorrect for single filter parameter (strategy closure with parameters)"
+        );
 
         // closure as [ object, method ] array
-        $result = (new TestFilter([ 'closure_strategy_array' => [ 'special name', 3 ] ]))->apply(TestSimpleModel::query())->get();
+        $result = (new TestFilter([ 'closure_strategy_array' => [ 'special name', 3 ] ]))
+                    ->apply(TestSimpleModel::query())->get();
 
-        $this->assertCount(1, $result, "Count for single filter parameter incorrect (strategy closure with parameters, array syntax)");
-        $this->assertEquals('1337', $result->first()->{self::UNIQUE_FIELD}, "Result incorrect for single filter parameter (strategy closure with parameters, array syntax)");
+        $this->assertCount(
+            1,
+            $result,
+            "Count for single filter parameter incorrect (strategy closure with parameters, array syntax)"
+        );
+        $this->assertEquals(
+            '1337',
+            $result->first()->{self::UNIQUE_FIELD},
+            "Result incorrect for single filter parameter (strategy closure with parameters, array syntax)"
+        );
     }
 
 
     // --------------------------------------------
-    //      Joins handling and ignoring params
+    //      Joins handling
     // --------------------------------------------
 
-    // test adding joins, whether no duplicates are added
-    // test whether the (un)ignoreParameter methods work
+
+    /**
+     * @test
+     */
+    function it_adds_joins_and_applies_them_after_all_filters()
+    {
+        // add joins using addJoin method
+        $query = (new TestFilter([
+            'adding_joins' => 'okay',
+        ]))->apply(TestSimpleModel::query())->toSql();
+
+        $this->assertRegExp(
+            '#adding_joins#i',
+            $query,
+            "Query SQL did not have parameter check in where clause"
+        );
+
+        $this->assertRegExp(
+            '#(inner )?join [`"]test_related_models[`"] on [`"]test_related_models[`"].[`"]id[`"] '
+                . '= [`"]test_simple_models[`"].[`"]test_related_model_id[`"]#i',
+            $query,
+            "Query SQL does not feature expected join clause"
+        );
+
+
+        // check if joins are not duplicated
+        $query = (new TestFilter([
+            'adding_joins'       => 'okay',
+            'no_duplicate_joins' => 'please',
+        ]))->apply(TestSimpleModel::query())->toSql();
+
+        $this->assertRegExp(
+            '#no_duplicate_joins#i',
+            $query,
+            "Query SQL did not have parameter check in where clause (second param)"
+        );
+
+        $this->assertRegExp(
+            '#(inner )?join [`"]test_related_models[`"] on [`"]test_related_models[`"].[`"]id[`"] '
+                . '= [`"]test_simple_models[`"].[`"]test_related_model_id[`"]#i',
+            $query,
+            "Query SQL does not feature expected join clause (with second param)"
+        );
+
+        $this->assertEquals(
+            1,
+            substr_count(strtolower($query), ' join '),
+            "Query SQL should have only one join clause"
+        );
+    }
 }

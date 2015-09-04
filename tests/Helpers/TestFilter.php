@@ -42,6 +42,22 @@ class TestFilter extends Filter
             return $query;
         }
 
+        // testing joins addition
+        switch ($name) {
+
+            case 'adding_joins':
+            case 'no_duplicate_joins':
+
+                $this->addJoin(
+                    'UNIQUE_JOIN_KEY',
+                    [ 'test_related_models', 'test_related_models.id', '=', 'test_simple_models.test_related_model_id' ]
+                );
+
+                $query->where($name, '=', $value);
+
+                return $query;
+        }
+
         parent::applyParameter($name, $value, $query);
     }
 
