@@ -3,6 +3,7 @@ namespace Czim\Filter;
 
 use Czim\Filter\Exceptions\FilterDataValidationFailedException;
 use Illuminate\Contracts\Support\Arrayable;
+use InvalidArgumentException;
 
 /**
  * Data object that have the settings that Filters need to apply
@@ -43,30 +44,34 @@ class FilterData implements Contracts\FilterDataInterface, Contracts\Validatable
     public function __construct($attributes, $defaults = null)
     {
         // store attributes as an array
-        if ( ! is_array($attributes)) {
-
-            if (is_a($attributes, Arrayable::class)) {
-
-                $attributes = $attributes->toArray();
-
-            } else {
-                // guarantee it will be an array
-                $attributes = [ $attributes ];
-            }
+        if (is_a($attributes, Arrayable::class)) {
+            $attributes = $attributes->toArray();
         }
 
-        $this->attributes = array_merge($this->defaults, $attributes);
+        if ( ! is_array($attributes)) {
+            throw new InvalidArgumentException("FilterData constructor parameter was not an array or Arrayable");
+        }
 
-        // validate the attributes passed in
+        // validate the only the attribute values passed in
+        $this->attributes = $attributes;
         $this->validateAttributes();
 
         // if default overrides are provided, save them
         if ( ! empty($defaults)) {
 
-            if ( ! is_array($defaults)) $defaults = $defaults->toArray();
+            if (is_a($defaults, Arrayable::class)) {
+                $defaults = $defaults->toArray();
+            }
+
+            if ( ! is_array($attributes)) {
+                throw new InvalidArgumentException("FilterData constructor parameter for defaults was not an array or Arrayable");
+            }
 
             $this->defaults = $defaults;
         }
+
+        // set attributes, filling in defaults
+        $this->attributes = array_merge($this->defaults, $attributes);
     }
 
 
