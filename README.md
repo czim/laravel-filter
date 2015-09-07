@@ -2,6 +2,7 @@
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Software License][ico-license]](LICENSE.md)
+[![Build Status](https://travis-ci.org/czim/laravel-filter.svg?branch=master)](https://travis-ci.org/czim/laravel-filter)
 [![Latest Stable Version](http://img.shields.io/packagist/v/czim/laravel-filter.svg)](https://packagist.org/packages/czim/laravel-filter)
 
 Configurable and modular Filter setup for Laravel.
