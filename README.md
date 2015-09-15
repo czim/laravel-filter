@@ -69,7 +69,7 @@ If you do not have the `$filterDataClass` property overridden, however, your fil
 In you extension of the `Filter` class, override the property like so in order to be able to let the Filter create it automatically:
 
 ``` php
-    class YourFilter extends \Czim\Filter
+    class YourFilter extends \Czim\Filter\Filter
     {
         protected $filterDataClass = \Your\FilterDataClass::class;
         
@@ -126,7 +126,7 @@ For example, if you'd do the following:
 ``` php
     $query = SomeModel::where('some_column', 1);
      
-    $query = (new YourFilter([ 'name' => 'random' ])->apply($query);
+    $query = (new YourFilter([ 'name' => 'random' ]))->apply($query);
      
     echo $query->toSql();
 ```
