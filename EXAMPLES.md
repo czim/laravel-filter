@@ -129,6 +129,7 @@ class ProductFilter extends Filter
                 // query builder when all filter parameters are applied.
                 // If you were to call addJoin with the same ('category_product') key name
                 // again, it would only be added to the query once.
+                
                 $this->addJoin('category_product', [
                     'category_product',
                     'category_product.product_id', '=', 'products.id'
@@ -148,4 +149,104 @@ class ProductFilter extends Filter
 
 ## CountableFilter
 
-add example for countable filter
+It might make sense to make this ProductFilter into a CountableFilter, which can return counts for `brands` and `categories`.
+For instance, you would pass in as filter data the following:
+
+ ```php
+      [
+          'categories' => [ 3, 4 ],
+      ]
+  ```
+
+And receive the alternative counts by calling `getCountables()` on the filter:
+
+```php
+    // the toArray() of the CountResult returned: 
+    [
+        'brands' => [
+            1 => 2,     // For products belonging to either Category #3 or #4, 
+            2 => 1,     // there are two Products for Brand #1, one for #2
+            4 => 10,    // and ten for Brand #4. None for #3 or any other, in this case.
+        ],
+        'categories' => [
+            1 => 5,     // These counts are the results for all products,
+            2 => 3,     // since no other filter parameters are active but
+            3 => 11,    // the one on categories. So this list gives the product
+            4 => 8,     // counts for when the categories filter would not be applied.
+        ],
+    ]
+```
+
+
+To make this Filter work as a CountableFilter, change the `ProductFilter` class so that it extends `CountableFilter` instead:
+
+```php
+use Czim\Filter\CountableFilter;
+
+class ProductFilter extends CountableFilter
+{
+```
+
+And add the following to it:
+
+```php
+
+    // Only return counts for the brands and categories related
+    protected $countables = [
+        'brands',
+        'categories',
+    ];
+
+
+    /**
+     * @param string $parameter name of the countable parameter
+     * @return EloquentBuilder
+     */
+    protected function getCountableBaseQuery($parameter = null)
+    {
+        return \App\Product::query();
+    }
+
+    protected function countStrategies()
+    {
+        return [
+        
+            // For the given example call, this would return all
+            // Brand id's with product counts for each; but only for
+            // the subset that results from filtering by categories
+            // (or any other filter parameter other than brands itself).
+            
+            'brands' => new ParameterCounters\SimpleBelongsTo(),
+        ];
+        
+        // 'categories' is not present here either, since it 
+        // will similarly be handled in the countParameter method.
+    }
+
+
+    /**
+     * @param string          $parameter countable name
+     * @param EloquentBuilder $query
+     * @return mixed
+     */
+    protected function countParameter($parameter, $query)
+    {
+        switch ($parameter) {
+
+            case 'categories':
+                
+                // The query that will be executed for this is modified to include
+                // all parameters (in the example, none will be applied for categories,
+                // so it would be the same as executing it on Product:: instead of the
+                // $query parameter here.
+                
+                return $query->select('category_product.category_id AS id', \DB::raw('COUNT(*) AS count'))
+                             ->groupBy('category_product.category_id')
+                             ->join('category_product', 'category_product.product_id', '=', 'products.id')
+                             ->lists('count', 'id');
+
+        }
+        
+        return parent::countParameter($parameter, $query);
+    }
+```
