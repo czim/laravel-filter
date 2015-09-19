@@ -59,7 +59,7 @@ class ProductData extends FilterData
         'ean'        => 'string|max:20',
         'products'   => 'array|each:exists,products,id',
         'brands'     => 'array|each:exists,brands,id',
-        'categories' => 'array|each:exists,product_categories,id',
+        'categories' => 'array|each:exists,categories,id',
     ];
 
     protected $defaults = [

@@ -76,9 +76,9 @@ class CreateCategoriesTable extends Migration
                   ->onDelete('cascade');
 
             $table->foreign('product_id', 'fk_category_product_products1')
-                ->references('id')
-                ->on('products')
-                ->onDelete('cascade');
+                  ->references('id')
+                  ->on('products')
+                  ->onDelete('cascade');
 
             $table->primary(['category_id', 'product_id']);
         });
