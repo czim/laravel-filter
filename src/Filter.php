@@ -61,6 +61,14 @@ class Filter implements Contracts\FilterInterface
     protected $joins = [];
 
     /**
+     * Join memory for type of join, defaults to left.
+     * Must be keyed by join identifier key
+     *
+     * @var array
+     */
+    protected $joinTypes = [];
+
+    /**
      * Parameter names to be ignored while applying the filter
      * Used by CountableFilter to look up every parameter but
      * the active one. If you use this for other things, be
@@ -323,12 +331,27 @@ class Filter implements Contracts\FilterInterface
     /**
      * Adds a query join to be added after all parameters are applied
      *
-     * @param string $key       identifying key, used to prevent duplicates
+     * @param string $key           identifying key, used to prevent duplicates
      * @param array  $parameters
+     * @param string $joinType      'inner', 'right', defaults to left join
+     * @return $this
      */
-    public function addJoin($key, array $parameters)
+    public function addJoin($key, array $parameters, $joinType = null)
     {
+        if ( ! is_null($joinType)) {
+
+            if (stripos($joinType, 'inner')) {
+                $this->joinTypes[$key] = 'join';
+            } elseif (stripos($joinType, 'right')) {
+                $this->joinTypes[$key] = 'rightJoin';
+            } else {
+                unset( $this->joinTypes[$key] );
+            }
+        }
+
         $this->joins[$key] = $parameters;
+
+        return $this;
     }
 
     /**
@@ -340,7 +363,13 @@ class Filter implements Contracts\FilterInterface
     {
         foreach ($this->joins as $key => $join) {
 
-            call_user_func_array([ $query, 'join' ], $join);
+            if (isset($this->joinTypes[$key])) {
+                $joinMethod = $this->joinTypes[$key];
+            } else {
+                $joinMethod = 'leftJoin';
+            }
+
+            call_user_func_array([ $query, $joinMethod ], $join);
         }
     }
 

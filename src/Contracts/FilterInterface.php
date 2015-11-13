@@ -36,10 +36,12 @@ interface FilterInterface
     /**
      * Adds a query join to be added after all parameters are applied
      *
-     * @param string $key       identifying key, used to prevent duplicates
+     * @param string $key           identifying key, used to prevent duplicates
      * @param array  $parameters
+     * @param string $joinType      'inner', 'right', defaults to left join
+     * @return $this
      */
-    public function addJoin($key, array $parameters);
+    public function addJoin($key, array $parameters, $joinType = null);
 
     /**
      * Getter for settings
