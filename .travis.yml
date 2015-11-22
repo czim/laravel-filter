@@ -8,3 +8,7 @@ php:
 install: composer install --dev
 
 script: phpunit
+
+notifications:
+  email:
+    on_success: never
