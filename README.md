@@ -4,6 +4,8 @@
 [![Software License][ico-license]](LICENSE.md)
 [![Build Status](https://travis-ci.org/czim/laravel-filter.svg?branch=master)](https://travis-ci.org/czim/laravel-filter)
 [![Latest Stable Version](http://img.shields.io/packagist/v/czim/laravel-filter.svg)](https://packagist.org/packages/czim/laravel-filter)
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/d7fa4bf3-4f79-4095-9dda-abb3611d9a1c/mini.png)](https://insight.sensiolabs.com/projects/d7fa4bf3-4f79-4095-9dda-abb3611d9a1c)
+
 
 Configurable and modular Filter setup for Laravel.
 This is intended to make it easy to search for and filter by records using a typical web shop filter.
