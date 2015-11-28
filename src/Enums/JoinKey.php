@@ -8,8 +8,6 @@ use PHPExtra\Type\Enum\Enum;
  */
 class JoinKey extends Enum
 {
-    const _DEFAULT = '';
-
     const TRANSLATIONS = 'translations';
     const PARENT       = 'parent';
     const CHILDREN     = 'children';
