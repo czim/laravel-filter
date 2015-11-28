@@ -1,7 +1,6 @@
 <?php
 namespace Czim\Filter\Traits;
 
-use Illuminate\Contracts\Support\MessageBag;
 use Validator;
 
 /**
@@ -38,7 +37,7 @@ trait Validatable
     /**
      * Returns validation errors, if any
      *
-     * @return MessageBag
+     * @return \Illuminate\Contracts\Support\MessageBag
      */
     public function messages()
     {
