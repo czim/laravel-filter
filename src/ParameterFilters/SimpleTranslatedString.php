@@ -99,7 +99,7 @@ class SimpleTranslatedString implements ParameterFilterInterface
 
         // add a join for the translations
         $filter->addJoin(
-            JoinKey::Translations,
+            JoinKey::TRANSLATIONS,
             [
                 $this->translationTable,
                 $this->translationTable . '.' . str_singular($this->table) . '_id',
