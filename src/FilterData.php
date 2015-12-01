@@ -48,6 +48,10 @@ class FilterData implements Contracts\FilterDataInterface, Contracts\Validatable
             $attributes = $attributes->toArray();
         }
 
+        if (empty($attributes)) {
+            $attributes = [];
+        }
+
         if ( ! is_array($attributes)) {
             throw new InvalidArgumentException("FilterData constructor parameter was not an array or Arrayable");
         }
