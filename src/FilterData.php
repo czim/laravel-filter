@@ -115,7 +115,7 @@ class FilterData implements Contracts\FilterDataInterface, Contracts\Validatable
      */
     protected function validateAttributes()
     {
-        if (empty($this->rules)) return;
+        if (empty($this->getRules())) return;
 
         if ( ! $this->validate()) {
 
@@ -143,4 +143,5 @@ class FilterData implements Contracts\FilterDataInterface, Contracts\Validatable
     {
         return $this->attributes;
     }
+
 }
