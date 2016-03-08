@@ -124,6 +124,9 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
 
         foreach ($countables as $parameterName) {
 
+            // should we skip it no matter what?
+            if ($this->isCountableIgnored($parameterName)) continue;
+
             $strategy = isset($strategies[$parameterName]) ? $strategies[$parameterName] : null;
 
             // normalize the strategy so that we can call_user_func on it
@@ -223,7 +226,10 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
     }
 
     /**
-     * Disables one or more countables when getCounts() is invoked
+     * Disables one or more countables when getCounts() is invoked.
+     *
+     * Note that this differs from ignoreParameter in that the count itself is omitted, but it does not
+     * affect what parameters get applied to the queries for the other countables!
      *
      * @param string|array $countable
      * @return $this
@@ -250,6 +256,19 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
         $this->ignoreCountables = array_diff($this->ignoreCountables, $countable);
 
         return $this;
+    }
+
+    /**
+     * Returns whether a given countable is currently being ignored/omitted
+     *
+     * @param string $countableName
+     * @return bool
+     */
+    public function isCountableIgnored($countableName)
+    {
+        if (empty($this->ignoreCountables)) return false;
+
+        return (array_search($countableName, $this->ignoreCountables) !== false);
     }
 
 }
