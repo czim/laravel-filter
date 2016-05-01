@@ -1,7 +1,7 @@
 <?php
 namespace Czim\Filter\Enums;
 
-use PHPExtra\Type\Enum\Enum;
+use MyCLabs\Enum\Enum;
 
 /**
  * Unique identifiers for standard join parameter-sets in filters
