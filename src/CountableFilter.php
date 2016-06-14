@@ -153,7 +153,7 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
             // apply the filter while temporarily ignoring the current countable parameter
             $this->ignoreParameter($parameterName);
             $this->apply($query);
-            $this->unIgnoreParameter($parameterName);
+            $this->unignoreParameter($parameterName);
 
             // retrieve the count and put it in the results
             $counts->put($parameterName, call_user_func_array($strategy, [$parameterName, $query, $this]));
