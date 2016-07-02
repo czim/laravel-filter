@@ -24,13 +24,6 @@ Via Composer
 $ composer require czim/laravel-filter
 ```
 
-If you run into problems with `phpextra/enum`, please run its installation separately beforehand:
-
-``` bash
-$ composer require phpextra/enum 'dev-master'
-```
-
-
 ## Basic Usage
 
 Make a class that extends `Czim\FilterData` and set the protected propeties for validation rules `$rules` and the default values for these attributes `$defaults`.
