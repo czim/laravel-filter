@@ -243,7 +243,7 @@ And add the following to it:
                 return $query->select('category_product.category_id AS id', \DB::raw('COUNT(*) AS count'))
                              ->groupBy('category_product.category_id')
                              ->join('category_product', 'category_product.product_id', '=', 'products.id')
-                             ->lists('count', 'id');
+                             ->pluck('count', 'id');
 
         }
         

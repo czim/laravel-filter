@@ -83,7 +83,7 @@ class SimpleBelongsTo implements ParameterCounterInterface
             DB::raw("{$this->countRaw} AS {$this->countAlias}")
         )
             ->groupBy($columnName)
-            ->lists($this->countAlias, $this->columnAlias);
+            ->pluck($this->countAlias, $this->columnAlias);
     }
 }
 
