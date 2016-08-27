@@ -1,18 +1,8 @@
 <?php
 namespace Czim\Filter\Contracts;
 
-use Illuminate\Contracts\Support\Arrayable;
-
 interface FilterDataInterface
 {
-
-    /**
-     * Constructor: validate filter data
-     *
-     * @param array|Arrayable $attributes
-     * @param array|Arrayable $defaults     if provided, overrides internal defaults
-     */
-    public function __construct($attributes, $defaults = null);
 
     /**
      * Get the instance as an array.
