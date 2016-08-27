@@ -1,19 +1,11 @@
 <?php
 namespace Czim\Filter\Contracts;
 
-use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 
 interface FilterInterface
 {
-
-    /**
-     * Constructs the relevant FilterData if one is not injected
-     *
-     * @param array|Arrayable|FilterDataInterface $data
-     */
-    public function __construct($data);
 
     /**
      * @param FilterDataInterface $data
