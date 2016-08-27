@@ -196,7 +196,7 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
 
                     $reflection = new ReflectionClass($strategy);
 
-                    if ( ! $reflection->IsInstantiable()) {
+                    if ( ! $reflection->isInstantiable()) {
                         throw new ParameterStrategyInvalidException("Uninstantiable string provided as countStrategy for '{$strategy}'");
                     }
 
