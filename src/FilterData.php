@@ -67,7 +67,7 @@ class FilterData implements Contracts\FilterDataInterface, Contracts\Validatable
                 $defaults = $defaults->toArray();
             }
 
-            if ( ! is_array($attributes)) {
+            if ( ! is_array($defaults)) {
                 throw new InvalidArgumentException("FilterData constructor parameter for defaults was not an array or Arrayable");
             }
 
