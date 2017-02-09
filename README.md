@@ -26,7 +26,7 @@ $ composer require czim/laravel-filter
 
 ## Basic Usage
 
-Make a class that extends `Czim\FilterData` and set the protected propeties for validation rules `$rules` and the default values for these attributes `$defaults`.
+Make a class that extends `Czim\FilterData` and set the protected properties for validation rules `$rules` and the default values for these attributes `$defaults`.
 Note that `$defaults` are used as the main means to detect which filter parameters need to be applied to the query, so make sure all filter parameters you want to implement are present in it.
 
 Simply extend the (abstract) filter class of your choice, either `Czim\Filter\Filter` or `Czim\Filter\CountableFilter`.
