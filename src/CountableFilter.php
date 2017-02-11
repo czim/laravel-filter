@@ -24,7 +24,7 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
      * for the getCounts() method. This is what's used to determine which other
      * filter options (f.i. brands, product lines) to show for the current selection
      *
-     * @var array
+     * @var string[]
      */
     protected $countables = [];
 
@@ -46,7 +46,7 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
     /**
      * List of countables that should not be included in getCount() results.
      *
-     * @var array
+     * @var string[]
      */
     protected $ignoreCountables = [];
 
