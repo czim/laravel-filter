@@ -51,6 +51,17 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
     protected $ignoreCountables = [];
 
     /**
+     * List of countables that should be applied even when performing a count for that same countable.
+     *
+     * Set this, for instance, for plural AND-applied checkbox filters where every check should further
+     * restrict the available options.
+     *
+     * @var string[]
+     */
+    protected $includeSelfInCount = [];
+
+
+    /**
      * Returns new base query object to build countable query on.
      * This will be called for each countable parameter, and could be
      * something like: EloquentModelName::query();
@@ -150,10 +161,19 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
             // start with a fresh query
             $query = $this->getCountableBaseQuery();
 
-            // apply the filter while temporarily ignoring the current countable parameter
-            $this->ignoreParameter($parameterName);
+            // apply the filter while temporarily ignoring the current countable parameter,
+            // unless it is forced to be included
+            $includeSelf = in_array($parameterName, $this->includeSelfInCount);
+
+            if ( ! $includeSelf) {
+                $this->ignoreParameter($parameterName);
+            }
+
             $this->apply($query);
-            $this->unignoreParameter($parameterName);
+
+            if ( ! $includeSelf) {
+                $this->unignoreParameter($parameterName);
+            }
 
             // retrieve the count and put it in the results
             $counts->put($parameterName, call_user_func_array($strategy, [$parameterName, $query, $this]));
