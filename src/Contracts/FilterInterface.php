@@ -18,22 +18,12 @@ interface FilterInterface
     public function getFilterData();
 
     /**
-     * Applies the loaded FilterData to a query (builder)
+     * Setter for global settings
      *
-     * @param Model|EloquentBuilder $query
-     * @return EloquentBuilder
+     * @param string $key
+     * @param null   $value
      */
-    public function apply($query);
-
-    /**
-     * Adds a query join to be added after all parameters are applied
-     *
-     * @param string $key           identifying key, used to prevent duplicates
-     * @param array  $parameters
-     * @param string $joinType      'inner', 'right', defaults to left join
-     * @return $this
-     */
-    public function addJoin($key, array $parameters, $joinType = null);
+    public function setSetting($key, $value = null);
 
     /**
      * Getter for settings
@@ -51,4 +41,21 @@ interface FilterInterface
      */
     public function parameterValue($name);
 
+    /**
+     * Applies the loaded FilterData to a query (builder)
+     *
+     * @param Model|EloquentBuilder $query
+     * @return EloquentBuilder
+     */
+    public function apply($query);
+
+    /**
+     * Adds a query join to be added after all parameters are applied
+     *
+     * @param string $key           identifying key, used to prevent duplicates
+     * @param array  $parameters
+     * @param string $joinType      'inner', 'right', defaults to left join
+     * @return $this
+     */
+    public function addJoin($key, array $parameters, $joinType = null);
 }
