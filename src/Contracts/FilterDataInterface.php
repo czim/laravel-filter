@@ -32,4 +32,11 @@ interface FilterDataInterface
      * @return mixed
      */
     public function getParameterValue($name);
+
+    /**
+     * Getter for attributes
+     *
+     * @return array
+     */
+    public function getAttributes();
 }
