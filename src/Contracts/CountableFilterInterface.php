@@ -6,6 +6,13 @@ use Czim\Filter\CountableResults;
 interface CountableFilterInterface extends FilterInterface
 {
     /**
+     * Returns a list of the countable parameters to get counts for
+     *
+     * @return array
+     */
+    public function getCountables();
+
+    /**
      * Gets alternative counts per (relevant) attribute for the filter data.
      *
      * @param array $countables     if provided, limits the result to theses countables
@@ -29,4 +36,11 @@ interface CountableFilterInterface extends FilterInterface
      */
     public function unignoreCountable($countable);
 
+    /**
+     * Returns whether a given countable is currently being ignored/omitted
+     *
+     * @param string $countableName
+     * @return bool
+     */
+    public function isCountableIgnored($countableName);
 }
