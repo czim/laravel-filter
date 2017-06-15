@@ -195,7 +195,7 @@ class Filter implements Contracts\FilterInterface
             // and if it is empty, we're not filtering by it and should skip it
             $parameterValue = $this->data->getParameterValue($parameterName);
 
-            if ($parameterValue !== false && empty($parameterValue)) continue;
+            if ($this->isParameterValueUnset($parameterName, $parameterValue)) continue;
 
 
             // find the strategy to be used for applying the filter for this parameter
@@ -247,7 +247,7 @@ class Filter implements Contracts\FilterInterface
             // and if it is empty, we're not filtering by it and should skip it
             $parameterValue = $this->parameterValue($parameterName);
 
-            if ($parameterValue !== false && empty($parameterValue)) continue;
+            if ($this->isParameterValueUnset($parameterName, $parameterValue)) continue;
 
             // check if the strategy is a string that should be instantiated as a class
             if (is_string($strategy) && $strategy !== static::SETTING) {
@@ -371,6 +371,18 @@ class Filter implements Contracts\FilterInterface
 
             call_user_func_array([ $query, $joinMethod ], $join);
         }
+    }
+
+    /**
+     * Returns whether a given parameter's value should be treated as empty or unset.
+     *
+     * @param string $parameter
+     * @param string $value
+     * @return bool
+     */
+    protected function isParameterValueUnset($parameter, $value)
+    {
+        return $value !== false && empty($value);
     }
 
     /**
