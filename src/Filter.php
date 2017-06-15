@@ -177,7 +177,7 @@ class Filter implements Contracts\FilterInterface
     /**
      * Applies all filter parameters to the query, using the configured strategies
      *
-     * @param $query
+     * @param Model|EloquentBuilder $query
      * @throws ParameterStrategyInvalidException
      */
     protected function applyParameters($query)
