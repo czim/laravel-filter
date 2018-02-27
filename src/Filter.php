@@ -340,9 +340,9 @@ class Filter implements Contracts\FilterInterface
     {
         if ( ! is_null($joinType)) {
 
-            if (stripos($joinType, 'inner')) {
+            if ($joinType == 'join' || stripos($joinType, 'inner') !== false) {
                 $this->joinTypes[$key] = 'join';
-            } elseif (stripos($joinType, 'right')) {
+            } elseif (stripos($joinType, 'right') !== false) {
                 $this->joinTypes[$key] = 'rightJoin';
             } else {
                 unset( $this->joinTypes[$key] );
