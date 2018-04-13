@@ -40,6 +40,7 @@ class FilterData implements Contracts\FilterDataInterface, Contracts\Validatable
      *
      * @param array|Arrayable $attributes
      * @param array|Arrayable $defaults     if provided, overrides internal defaults
+     * @throws FilterDataValidationFailedException
      */
     public function __construct($attributes, $defaults = null)
     {
@@ -112,6 +113,8 @@ class FilterData implements Contracts\FilterDataInterface, Contracts\Validatable
     /**
      * Validates currently set attributes (not including defaults)
      * against the given validation rules
+     *
+     * @throws FilterDataValidationFailedException
      */
     protected function validateAttributes()
     {
