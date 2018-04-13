@@ -76,7 +76,7 @@ class FilterData implements Contracts\FilterDataInterface, Contracts\Validatable
         }
 
         // set attributes, filling in defaults
-        $this->attributes = array_merge($this->defaults, $attributes);
+        $this->attributes = array_merge($this->defaults, $this->attributes);
     }
 
 
