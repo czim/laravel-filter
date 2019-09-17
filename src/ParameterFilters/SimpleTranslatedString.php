@@ -5,6 +5,7 @@ use Czim\Filter\Contracts\FilterInterface;
 use Czim\Filter\Contracts\ParameterFilterInterface;
 use Czim\Filter\Enums\JoinKey;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Support\Str;
 
 /**
  * Simple string comparison for a single column on a translated attribute.
@@ -60,7 +61,7 @@ class SimpleTranslatedString implements ParameterFilterInterface
     {
         // translated table name to translations version
         if (empty($translationTable)) {
-            $translationTable = str_singular($table) . self::TRANSLATION_TABLE_POSTFIX;
+            $translationTable = Str::singular($table) . self::TRANSLATION_TABLE_POSTFIX;
         }
 
         if (empty($locale)) $locale = app()->getLocale();
@@ -102,7 +103,7 @@ class SimpleTranslatedString implements ParameterFilterInterface
             JoinKey::TRANSLATIONS,
             [
                 $this->translationTable,
-                $this->translationTable . '.' . str_singular($this->table) . '_id',
+                $this->translationTable . '.' . Str::singular($this->table) . '_id',
                 '=',
                 $this->table . '.id'
             ]
