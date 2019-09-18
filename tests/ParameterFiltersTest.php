@@ -5,17 +5,9 @@ use Czim\Filter\ParameterFilters\SimpleInteger;
 use Czim\Filter\ParameterFilters\SimpleString;
 use Czim\Filter\Test\Helpers\TestFilter;
 use Czim\Filter\Test\Helpers\TestSimpleModel;
-use Illuminate\Contracts\Support\MessageBag;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
 
 class ParameterFiltersTest extends TestCase
 {
-
-    public function setUp()
-    {
-        parent::setUp();
-    }
 
     protected function seedDatabase()
     {

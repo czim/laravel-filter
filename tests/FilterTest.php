@@ -2,13 +2,13 @@
 namespace Czim\Filter\Test;
 
 use Czim\Filter\Contracts\FilterInterface;
+use Czim\Filter\Exceptions\FilterDataValidationFailedException;
+use Czim\Filter\Exceptions\FilterParameterUnhandledException;
+use Czim\Filter\Exceptions\ParameterStrategyInvalidException;
 use Czim\Filter\Test\Helpers\TestFilter;
 use Czim\Filter\Test\Helpers\TestFilterData;
 use Czim\Filter\Test\Helpers\TestRelatedModel;
 use Czim\Filter\Test\Helpers\TestSimpleModel;
-use Illuminate\Contracts\Support\MessageBag;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
 
 class FilterTest extends TestCase
 {
@@ -16,11 +16,6 @@ class FilterTest extends TestCase
     const UNIQUE_FIELD = 'unique_field';
     const SECOND_FIELD = 'second_field';
 
-
-    public function setUp()
-    {
-        parent::setUp();
-    }
 
     protected function seedDatabase()
     {
@@ -189,42 +184,46 @@ class FilterTest extends TestCase
 
     /**
      * @test
-     * @expectedException \Czim\Filter\Exceptions\FilterParameterUnhandledException
      */
     function it_throws_an_exception_if_no_strategy_was_defined_for_a_parameter()
     {
+        $this->expectException(FilterParameterUnhandledException::class);
+
         (new TestFilter([ 'no_strategy_set_no_fallback' => 'something to activate it' ]))
             ->apply(TestSimpleModel::query());
     }
 
     /**
      * @test
-     * @expectedException \Czim\Filter\Exceptions\ParameterStrategyInvalidException
-     * @expectedExceptionMessageRegExp #uninstantiable_string_that_is_not_a_parameter_filter#i
      */
     function it_throws_an_exception_if_a_strategy_string_is_not_instantiable()
     {
+        $this->expectException(ParameterStrategyInvalidException::class);
+        $this->expectExceptionMessageRegExp('#uninstantiable_string_that_is_not_a_parameter_filter#i');
+
         (new TestFilter([ 'invalid_strategy_string' => 'ignored' ]))
             ->apply(TestSimpleModel::query());
     }
 
     /**
      * @test
-     * @expectedException \Czim\Filter\Exceptions\ParameterStrategyInvalidException
      */
     function it_throws_an_exception_if_a_strategy_value_is_of_wrong_type()
     {
+        $this->expectException(ParameterStrategyInvalidException::class);
+
         (new TestFilter([ 'invalid_strategy_general' => 'ignored' ]))
             ->apply(TestSimpleModel::query());
     }
 
     /**
      * @test
-     * @expectedException \Czim\Filter\Exceptions\ParameterStrategyInvalidException
-     * @expectedExceptionMessageRegExp #is not a?\s*ParameterFilter#i
      */
     function it_throws_an_exception_if_an_instantiated_strategy_string_does_not_implement_parameterfilterinterface()
     {
+        $this->expectException(ParameterStrategyInvalidException::class);
+        $this->expectExceptionMessageRegExp('#is not a?\s*ParameterFilter#i');
+
         (new TestFilter([ 'invalid_strategy_interface' => 'ignored' ]))
             ->apply(TestSimpleModel::query());
     }

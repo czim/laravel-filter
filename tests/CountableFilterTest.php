@@ -16,12 +16,6 @@ class CountableFilterTest extends TestCase
     const UNIQUE_FIELD = 'unique_field';
     const SECOND_FIELD = 'second_field';
 
-
-    public function setUp()
-    {
-        parent::setUp();
-    }
-
     protected function seedDatabase()
     {
         TestSimpleModel::create([

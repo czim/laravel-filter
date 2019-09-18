@@ -2,17 +2,14 @@
 namespace Czim\Filter\Test;
 
 use Czim\Filter\Contracts\FilterDataInterface;
+use Czim\Filter\Exceptions\FilterDataValidationFailedException;
 use Czim\Filter\Test\Helpers\TestFilterData;
 use Illuminate\Contracts\Support\MessageBag;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use InvalidArgumentException;
 
 class FilterDataTest extends TestCase
 {
-    public function setUp()
-    {
-        parent::setUp();
-    }
 
     protected function seedDatabase()
     {
@@ -55,11 +52,9 @@ class FilterDataTest extends TestCase
 
     /**
      * @test
-     * @expectedException \Czim\Filter\Exceptions\FilterDataValidationFailedException
      */
     function it_throws_an_exception_if_invalid_data_is_passed_in()
     {
-
         // see if we get the messages correctly
         try {
             new TestFilterData([
@@ -68,13 +63,15 @@ class FilterDataTest extends TestCase
                 'position'      => 'string which should be an integer',
                 'with_inactive' => 'not even a boolean here',
             ]);
-        } catch (\Czim\Filter\Exceptions\FilterDataValidationFailedException $e) {
+        } catch (FilterDataValidationFailedException $e) {
 
             $messages = $e->getMessages();
 
             $this->assertInstanceOf(MessageBag::class, $messages, "Exception getMessages is not a MessageBag");
             $this->assertCount(3, $messages, "Exception getMessages should have 3 messages");
         }
+
+        $this->expectException(FilterDataValidationFailedException::class);
 
         // throw the exception, but don't catch it this time
         new TestFilterData([
@@ -87,10 +84,11 @@ class FilterDataTest extends TestCase
 
     /**
      * @test
-     * @expectedException \InvalidArgumentException
      */
     function it_throws_an_exception_if_constructor_parameter_is_not_an_array_or_arrayable()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         new TestFilterData(50 + 3932);
     }
 
