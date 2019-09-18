@@ -5,6 +5,8 @@ use Czim\Filter\Contracts\CountableFilterInterface;
 use Czim\Filter\Contracts\ParameterCounterInterface;
 use DB;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 /**
  * Counts different values for a single integer foreign key column with configurable aliases.
@@ -65,13 +67,13 @@ class SimpleBelongsTo implements ParameterCounterInterface
      * @param string                   $name
      * @param EloquentBuilder          $query
      * @param CountableFilterInterface $filter
-     * @return array
+     * @return Collection
      */
     public function count($name, $query, CountableFilterInterface $filter)
     {
         // if the columnname is not set, assume an id field based on a table name
         $columnName  = (empty($this->columnName))
-            ?   $columnName = str_singular($name) . '_id'
+            ?   $columnName = Str::singular($name) . '_id'
             :   $this->columnName;
 
         if ( ! $this->includeEmpty) {
