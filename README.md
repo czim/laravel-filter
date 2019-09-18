@@ -16,6 +16,14 @@ Additionally a CountableFilter extension of the class is provided for offering t
 
 This is not a ready-to-use package, but a framework you can extend for your own specific applications.
 
+## Version Compatibility
+
+ Laravel       | Package 
+:--------------|:--------
+ 5.8 and below | 1.1
+ 6.0 and up    | 2.0
+
+
 ## Install
 
 Via Composer
