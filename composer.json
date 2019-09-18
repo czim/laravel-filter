@@ -13,21 +13,20 @@
     "authors": [
         {
             "name": "Coen Zimmerman",
-            "email": "coen@pixelindustries.com",
-            "homepage": "http://www.pixelindustries.com",
+            "email": "coen@pxlwidgets.com",
+            "homepage": "http://www.pxlwidgets.com",
             "role": "Developer"
         }
     ],
     "require": {
-        "php" : ">=5.4.0",
-        "illuminate/support": "5.*",
-        "illuminate/database": "5.*",
+        "php" : ">=7.1.8",
+        "illuminate/support": "^5|^6",
+        "illuminate/database": "^5|^6",
         "myclabs/php-enum": "^1.4"
     },
     "require-dev": {
-        "phpunit/phpunit" : "4.*",
-        "scrutinizer/ocular": "~1.1",
-        "orchestra/testbench": "~3.0"
+        "phpunit/phpunit" : "^7.0|^8.0",
+        "orchestra/testbench": "^3.0|^4.0"
     },
     "autoload": {
         "psr-4": {
