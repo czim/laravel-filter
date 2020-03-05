@@ -20,8 +20,8 @@
     ],
     "require": {
         "php" : ">=7.1.8",
-        "illuminate/support": "^5|^6",
-        "illuminate/database": "^5|^6",
+        "illuminate/support": "^5|^6|^7",
+        "illuminate/database": "^5|^6|^7",
         "myclabs/php-enum": "^1.4"
     },
     "require-dev": {
