@@ -6,7 +6,7 @@ php:
 
 install: composer install --dev
 
-script: phpunit
+script: vendor/bin/phpunit
 
 notifications:
   email:
