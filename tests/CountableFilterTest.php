@@ -6,9 +6,6 @@ use Czim\Filter\CountableResults;
 use Czim\Filter\Test\Helpers\TestCountableFilter;
 use Czim\Filter\Test\Helpers\TestRelatedModel;
 use Czim\Filter\Test\Helpers\TestSimpleModel;
-use Illuminate\Contracts\Support\MessageBag;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
 
 class CountableFilterTest extends TestCase
 {

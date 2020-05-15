@@ -64,7 +64,9 @@ class SimpleTranslatedString implements ParameterFilterInterface
             $translationTable = Str::singular($table) . self::TRANSLATION_TABLE_POSTFIX;
         }
 
-        if (empty($locale)) $locale = app()->getLocale();
+        if (empty($locale)) {
+            $locale = app()->getLocale();
+        }
 
         $this->table            = $table;
         $this->translationTable = $translationTable;
@@ -105,7 +107,7 @@ class SimpleTranslatedString implements ParameterFilterInterface
                 $this->translationTable,
                 $this->translationTable . '.' . Str::singular($this->table) . '_id',
                 '=',
-                $this->table . '.id'
+                $this->table . '.id',
             ]
         );
 

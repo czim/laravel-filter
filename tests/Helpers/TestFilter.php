@@ -39,7 +39,7 @@ class TestFilter extends Filter
                 $query->where('active', true);
             }
 
-            return $query;
+            return;
         }
 
         // testing joins addition
@@ -55,7 +55,7 @@ class TestFilter extends Filter
 
                 $query->where($name, '=', $value);
 
-                return $query;
+                return;
         }
 
         parent::applyParameter($name, $value, $query);
@@ -65,10 +65,12 @@ class TestFilter extends Filter
     // note that this cannot be a private method, or the [] syntax won't work
     protected function closureTestMethod($name, $value, $query)
     {
-        if ( ! is_array($value) || count($value) !== 2) throw \Exception("Value for {$name} not correctly passed through closure!");
+        if ( ! is_array($value) || count($value) !== 2) {
+            throw \Exception("Value for {$name} not correctly passed through closure!");
+        }
 
         return $query->where('name', '=', $value[0])
-                     ->where('test_related_model_id', '=', $value[1]);
+            ->where('test_related_model_id', '=', $value[1]);
     }
 
 }

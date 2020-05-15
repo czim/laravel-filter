@@ -4,7 +4,6 @@ namespace Czim\Filter\Test\Helpers;
 use Czim\Filter\CountableFilter;
 use Czim\Filter\ParameterFilters;
 use Czim\Filter\ParameterCounters;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
 class TestCountableFilter extends CountableFilter
 {
@@ -32,7 +31,7 @@ class TestCountableFilter extends CountableFilter
                 $query->where('active', true);
             }
 
-            return $query;
+            return;
         }
 
         parent::applyParameter($name, $value, $query);
@@ -61,8 +60,6 @@ class TestCountableFilter extends CountableFilter
 
     protected function countParameter($parameter, $query)
     {
-
         parent::countParameter($parameter, $query);
     }
-
 }

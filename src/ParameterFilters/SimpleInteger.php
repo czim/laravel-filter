@@ -48,14 +48,15 @@ class SimpleInteger implements ParameterFilterInterface
     public function apply($name, $value, $query, FilterInterface $filter)
     {
         $column = ( ! empty($this->table) ? $this->table . '.' : null)
-            . ( ! empty($this->column) ? $this->column : $name);
+                . ( ! empty($this->column) ? $this->column : $name);
 
 
         // an array of values: do a whereIn query
-        if (is_a($value, Arrayable::class)) $value = $value->toArray();
+        if (is_a($value, Arrayable::class)) {
+            $value = $value->toArray();
+        }
 
         if (is_array($value)) {
-
             $query->whereIn($column, $value);
 
             return $query;

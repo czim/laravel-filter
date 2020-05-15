@@ -1,6 +1,7 @@
 <?php
 namespace Czim\Filter\Traits;
 
+use Illuminate\Support\MessageBag;
 use Validator;
 
 /**
@@ -46,8 +47,7 @@ trait Validatable
         }
 
         if ( ! $this->validator->fails()) {
-
-            return app('\\Illuminate\\Support\\Messagebag');
+            return app(MessageBag::class);
         }
 
         return $this->validator->messages();
@@ -60,7 +60,11 @@ trait Validatable
      */
     public function getRules()
     {
-        return (isset($this->rules)) ? $this->rules : [];
+        if (isset($this->rules)) {
+            return $this->rules;
+        }
+
+        return [];
     }
 
     /**

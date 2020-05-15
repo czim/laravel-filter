@@ -87,7 +87,6 @@ class Filter implements Contracts\FilterInterface
     {
         // create FilterData if provided data is not already
         if ( ! is_a($data, FilterDataInterface::class)) {
-
             $data = new $this->filterDataClass($data);
         }
 
@@ -142,7 +141,11 @@ class Filter implements Contracts\FilterInterface
      */
     public function setting($key)
     {
-        return isset($this->settings[$key]) ? $this->settings[$key] : null;
+        if (isset($this->settings[ $key ])) {
+            return $this->settings[ $key ];
+        }
+
+        return null;
     }
 
     /**
@@ -162,6 +165,7 @@ class Filter implements Contracts\FilterInterface
      *
      * @param Model|EloquentBuilder $query
      * @return EloquentBuilder
+     * @throws ParameterStrategyInvalidException
      */
     public function apply($query)
     {
@@ -189,22 +193,32 @@ class Filter implements Contracts\FilterInterface
         foreach ($this->data->getApplicableAttributes() as $parameterName) {
 
             // should we skip it no matter what?
-            if ($this->isParameterIgnored($parameterName)) continue;
+            if ($this->isParameterIgnored($parameterName)) {
+                continue;
+            }
 
             // get the value for the filter parameter
             // and if it is empty, we're not filtering by it and should skip it
             $parameterValue = $this->data->getParameterValue($parameterName);
 
-            if ($this->isParameterValueUnset($parameterName, $parameterValue)) continue;
+            if ($this->isParameterValueUnset($parameterName, $parameterValue)) {
+                continue;
+            }
 
 
             // find the strategy to be used for applying the filter for this parameter
             // then normalize the strategy so that we can call_user_func on it
 
-            $strategy = isset($strategies[$parameterName]) ? $strategies[$parameterName] : null;
+            if (isset($strategies[ $parameterName ])) {
+                $strategy = $strategies[ $parameterName ];
+            } else {
+                $strategy = null;
+            }
 
             // is it a global setting, not a normal parameter? skip it
-            if ($strategy === static::SETTING) continue;
+            if ($strategy === static::SETTING) {
+                continue;
+            }
 
 
             if (is_a($strategy, ParameterFilterInterface::class)) {
@@ -240,20 +254,22 @@ class Filter implements Contracts\FilterInterface
         foreach ($this->strategies as $parameterName => &$strategy) {
 
             // only build strategies we will actually use
-
-            if ($this->isParameterIgnored($parameterName)) continue;
+            if ($this->isParameterIgnored($parameterName)) {
+                continue;
+            }
 
             // get the value for the filter parameter
             // and if it is empty, we're not filtering by it and should skip it
             $parameterValue = $this->parameterValue($parameterName);
 
-            if ($this->isParameterValueUnset($parameterName, $parameterValue)) continue;
+            if ($this->isParameterValueUnset($parameterName, $parameterValue)) {
+                continue;
+            }
 
             // check if the strategy is a string that should be instantiated as a class
             if (is_string($strategy) && $strategy !== static::SETTING) {
 
                 try {
-
                     $reflection = new ReflectionClass($strategy);
 
                     if ( ! $reflection->IsInstantiable()) {
@@ -262,7 +278,7 @@ class Filter implements Contracts\FilterInterface
 
                     $strategy = new $strategy();
 
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
 
                     throw new ParameterStrategyInvalidException(
                         "Exception thrown while trying to reflect or instantiate string provided as strategy for '{$strategy}'",
@@ -297,7 +313,9 @@ class Filter implements Contracts\FilterInterface
     {
         foreach ($this->strategies as $setting => &$strategy) {
 
-            if ( ! is_string($strategy) || $strategy !== static::SETTING) continue;
+            if ( ! is_string($strategy) || $strategy !== static::SETTING) {
+                continue;
+            }
 
             $this->settings[ $setting ] = $this->parameterValue($setting);
         }
@@ -317,7 +335,9 @@ class Filter implements Contracts\FilterInterface
     protected function applyParameter($parameterName, $parameterValue, $query)
     {
         // default is to always warn that we don't have a strategy
-        throw new FilterParameterUnhandledException("No fallback strategy determined for for filter parameter '{$parameterName}'");
+        throw new FilterParameterUnhandledException(
+            "No fallback strategy determined for for filter parameter '{$parameterName}'"
+        );
     }
 
     /**
@@ -340,7 +360,7 @@ class Filter implements Contracts\FilterInterface
     {
         if ( ! is_null($joinType)) {
 
-            if ($joinType == 'join' || stripos($joinType, 'inner') !== false) {
+            if ($joinType === 'join' || stripos($joinType, 'inner') !== false) {
                 $this->joinTypes[$key] = 'join';
             } elseif (stripos($joinType, 'right') !== false) {
                 $this->joinTypes[$key] = 'rightJoin';
@@ -413,8 +433,10 @@ class Filter implements Contracts\FilterInterface
      */
     protected function isParameterIgnored($parameterName)
     {
-        if (empty($this->ignoreParameters)) return false;
+        if (empty($this->ignoreParameters)) {
+            return false;
+        }
 
-        return (array_search($parameterName, $this->ignoreParameters) !== false);
+        return in_array($parameterName, $this->ignoreParameters, true);
     }
 }

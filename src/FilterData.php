@@ -57,7 +57,7 @@ class FilterData implements Contracts\FilterDataInterface, Contracts\Validatable
             throw new InvalidArgumentException("FilterData constructor parameter was not an array or Arrayable");
         }
 
-        
+
         // validate and sanitize the attribute values passed in
         $this->attributes = $this->sanitizeAttributes($attributes);
 
@@ -134,7 +134,9 @@ class FilterData implements Contracts\FilterDataInterface, Contracts\Validatable
      */
     protected function validateAttributes()
     {
-        if (empty($this->getRules())) return;
+        if (empty($this->getRules())) {
+            return;
+        }
 
         if ( ! $this->validate()) {
 
@@ -145,12 +147,16 @@ class FilterData implements Contracts\FilterDataInterface, Contracts\Validatable
     /**
      * Gets the value for a parameter
      *
-     * @param $name
+     * @param string $name
      * @return mixed
      */
     public function getParameterValue($name)
     {
-        return (isset($this->attributes[$name])) ? $this->attributes[$name] : null;
+        if (isset($this->attributes[ $name ])) {
+            return $this->attributes[ $name ];
+        }
+
+        return null;
     }
 
     /**

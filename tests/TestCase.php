@@ -1,12 +1,9 @@
 <?php
 namespace Czim\Filter\Test;
 
-use Czim\Filter\Contracts\CriteriaInterface;
 use Czim\Filter\Test\Helpers\TranslatableConfig;
 use Illuminate\Database\DatabaseManager;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
-use PHPUnit_Framework_MockObject_MockObject;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
@@ -89,42 +86,4 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     }
 
     abstract protected function seedDatabase();
-
-
-    ///**
-    // * Makes a mock Criteria object for simple custom Criteria testing.
-    // * If no callback is given, it will simply return the model/query unaltered
-    // * (and have no effect).
-    // *
-    // * @param null     $expects
-    // * @param string   $name
-    // * @param Closure  $callback    the callback for the apply() method on the Criteria
-    // * @return PHPUnit_Framework_MockObject_MockObject
-    // */
-    //protected function makeMockCriteria($expects = null, $name = 'MockCriteria', Closure $callback = null)
-    //{
-    //    $mock = $this->getMockBuilder(CriteriaInterface::class)
-    //        ->disableOriginalConstructor()
-    //        ->setMockClassName($name)
-    //        ->getMock();
-    //
-    //    if (is_null($callback)) {
-    //        $callback = function($model) { return $model; };
-    //    }
-    //
-    //    if (is_null($expects)) {
-    //
-    //        $mock->method('apply')
-    //            ->will($this->returnCallback( $callback ));
-    //        return $mock;
-    //    }
-    //
-    //
-    //    $mock->expects($expects)
-    //        ->method('apply')
-    //        ->will($this->returnCallback( $callback ));
-    //
-    //    return $mock;
-    //}
-
 }

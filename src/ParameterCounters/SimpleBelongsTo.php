@@ -72,18 +72,21 @@ class SimpleBelongsTo implements ParameterCounterInterface
     public function count($name, $query, CountableFilterInterface $filter)
     {
         // if the columnname is not set, assume an id field based on a table name
-        $columnName  = (empty($this->columnName))
-            ?   $columnName = Str::singular($name) . '_id'
-            :   $this->columnName;
+        if (empty($this->columnName)) {
+            $columnName = $columnName = Str::singular($name) . '_id';
+        } else {
+            $columnName = $this->columnName;
+        }
 
         if ( ! $this->includeEmpty) {
             $query->whereNotNull($columnName);
         }
 
-        return $query->select(
-            "{$columnName} AS {$this->columnAlias}",
-            DB::raw("{$this->countRaw} AS {$this->countAlias}")
-        )
+        return $query
+            ->select(
+                "{$columnName} AS {$this->columnAlias}",
+                DB::raw("{$this->countRaw} AS {$this->countAlias}")
+            )
             ->groupBy($columnName)
             ->pluck($this->countAlias, $this->columnAlias);
     }

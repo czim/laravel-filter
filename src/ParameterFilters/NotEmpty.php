@@ -43,6 +43,6 @@ class NotEmpty implements ParameterFilterInterface
                 . ( ! empty($this->column) ? $this->column : $name);
 
         return $query->whereNotNull($column)
-                     ->where($column, '!=', '');
+            ->where($column, '!=', '');
     }
 }

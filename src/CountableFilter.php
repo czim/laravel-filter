@@ -129,16 +129,24 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
         $strategies = $this->buildCountableStrategies();
 
         // determine which countables to count for
-        $countables = ( ! empty($countables))
-                        ?   array_intersect($this->getCountables(), $countables)
-                        :   $this->getActiveCountables();
+        if ( ! empty($countables)) {
+            $countables = array_intersect($this->getCountables(), $countables);
+        } else {
+            $countables = $this->getActiveCountables();
+        }
 
         foreach ($countables as $parameterName) {
 
             // should we skip it no matter what?
-            if ($this->isCountableIgnored($parameterName)) continue;
+            if ($this->isCountableIgnored($parameterName)) {
+                continue;
+            }
 
-            $strategy = isset($strategies[$parameterName]) ? $strategies[$parameterName] : null;
+            if (isset($strategies[ $parameterName ])) {
+                $strategy = $strategies[ $parameterName ];
+            } else {
+                $strategy = null;
+            }
 
             // normalize the strategy so that we can call_user_func on it
             if (is_a($strategy, ParameterCounterInterface::class)) {
@@ -217,7 +225,9 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
                     $reflection = new ReflectionClass($strategy);
 
                     if ( ! $reflection->isInstantiable()) {
-                        throw new ParameterStrategyInvalidException("Uninstantiable string provided as countStrategy for '{$strategy}'");
+                        throw new ParameterStrategyInvalidException(
+                            "Uninstantiable string provided as countStrategy for '{$strategy}'"
+                        );
                     }
 
                     $strategy = new $strategy();
@@ -225,8 +235,10 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
                 } catch (\Exception $e) {
 
                     throw new ParameterStrategyInvalidException(
-                        "Exception thrown while trying to reflect or instantiate string provided as countStrategy for '{$strategy}'",
-                        0, $e
+                        'Exception thrown while trying to reflect or instantiate string '
+                        . "provided as countStrategy for '{$strategy}'",
+                        0,
+                        $e
                     );
                 }
 
@@ -256,7 +268,9 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
      */
     public function ignoreCountable($countable)
     {
-        if ( ! is_array($countable)) $countable = [ $countable];
+        if ( ! is_array($countable)) {
+            $countable = [ $countable];
+        }
 
         $this->ignoreCountables = array_merge($this->ignoreCountables, $countable);
 
@@ -271,7 +285,9 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
      */
     public function unignoreCountable($countable)
     {
-        if ( ! is_array($countable)) $countable = [ $countable];
+        if ( ! is_array($countable)) {
+            $countable = [ $countable];
+        }
 
         $this->ignoreCountables = array_diff($this->ignoreCountables, $countable);
 
@@ -286,9 +302,11 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
      */
     public function isCountableIgnored($countableName)
     {
-        if (empty($this->ignoreCountables)) return false;
+        if (empty($this->ignoreCountables)) {
+            return false;
+        }
 
-        return (array_search($countableName, $this->ignoreCountables) !== false);
+        return in_array($countableName, $this->ignoreCountables, true);
     }
 
 }
