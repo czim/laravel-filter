@@ -5,6 +5,7 @@ use Czim\Filter\Contracts\CountableFilterInterface;
 use Czim\Filter\Contracts\ParameterCounterInterface;
 use DB;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Support\Collection;
 
 /**
  * Counts different distinct values for a single column with configurable aliases.
@@ -63,7 +64,7 @@ class SimpleDistinctValue implements ParameterCounterInterface
      * @param string                   $name
      * @param EloquentBuilder          $query
      * @param CountableFilterInterface $filter
-     * @return array
+     * @return array|Collection
      */
     public function count($name, $query, CountableFilterInterface $filter)
     {
