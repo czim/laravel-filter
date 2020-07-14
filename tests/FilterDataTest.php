@@ -55,11 +55,9 @@ class FilterDataTest extends TestCase
 
     /**
      * @test
-     * @expectedException \Czim\Filter\Exceptions\FilterDataValidationFailedException
      */
     function it_throws_an_exception_if_invalid_data_is_passed_in()
     {
-
         // see if we get the messages correctly
         try {
             new TestFilterData([
@@ -76,6 +74,8 @@ class FilterDataTest extends TestCase
             $this->assertCount(3, $messages, "Exception getMessages should have 3 messages");
         }
 
+        $this->expectException(\Czim\Filter\Exceptions\FilterDataValidationFailedException::class);
+
         // throw the exception, but don't catch it this time
         new TestFilterData([
             'name'          => 'some name',
@@ -87,10 +87,11 @@ class FilterDataTest extends TestCase
 
     /**
      * @test
-     * @expectedException \InvalidArgumentException
      */
     function it_throws_an_exception_if_constructor_parameter_is_not_an_array_or_arrayable()
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         new TestFilterData(50 + 3932);
     }
 
