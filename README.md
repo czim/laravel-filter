@@ -18,7 +18,7 @@ This is not a ready-to-use package, but a framework you can extend for your own 
 
 ## Version Compatibility
 
- Laravel       | Package 
+ Laravel       | Package
 :--------------|:--------
  5.8 and below | 1.1
  6.0 and up    | 2.0
@@ -40,18 +40,18 @@ Note that `$defaults` are used as the main means to detect which filter paramete
 Simply extend the (abstract) filter class of your choice, either `Czim\Filter\Filter` or `Czim\Filter\CountableFilter`.
 
 Each has abstract methods that must be provided for the class to work. Once they are all set (see below), you can simply apply filter settings to a query:
- 
+
 ``` php
     $filterValues = [ 'attributename' => 'value', ... ];
 
     $filter = new SomeFilter($filterValues);
-    
+
     // get an Eloquent builder query for a model
     $query = SomeEloquentModel::query();
-    
+
     // apply the filter to the query
     $filteredQuery = $filter->apply($query);
-    
+
     // normal get() call on the now filtered query
     $results = $filteredQuery->get();
 ```
@@ -69,13 +69,13 @@ You can find more about countable filters below.
 
 You may pass any array or Arrayable data directly into the filter, and it will create a `FilterData` object for you.
 If you do not have the `$filterDataClass` property overridden, however, your filter will do nothing (because no attributes and defaults are set for it, the FilterData will always be empty).
-In you extension of the `Filter` class, override the property like so in order to be able to let the Filter create it automatically:
+In your extension of the `Filter` class, override the property like so in order to be able to let the Filter create it automatically:
 
 ``` php
     class YourFilter extends \Czim\Filter\Filter
     {
         protected $filterDataClass = \Your\FilterDataClass::class;
-        
+
         ...
     }
 ```
@@ -92,7 +92,7 @@ Your `FilterData` class should then look something like this:
             'before' => 'date',
             'active' => 'boolean',
         ];
-        
+
         // Default values and the parameter names accessible to the Filter class
         // If (optional) filter attributes are not provided, these defaults will be used:
         protected $defaults = [
@@ -128,15 +128,15 @@ For example, if you'd do the following:
 
 ``` php
     $query = SomeModel::where('some_column', 1);
-     
+
     $query = (new YourFilter([ 'name' => 'random' ]))->apply($query);
-     
+
     echo $query->toSql();
 ```
 
 You might expect the result to be something like `select * from some_models where some_column = 1 and name LIKE '%random%'`.
 
- 
+
 What a filter exactly does with the filter data you pass into its constructor must be defined in your implementation.
 This may be done in two main ways, which can be freely combined:
 
@@ -144,7 +144,7 @@ This may be done in two main ways, which can be freely combined:
 *   By overriding the `applyParameter()` method as a fallback option
 
 *Important*: filter logic is only invoked if the parameter's provided value is **not empty**.
-Regardless of the method you choose to make your filter application, it will *only* be applied if: `! empty($value) || $value === false`. 
+Regardless of the method you choose to make your filter application, it will *only* be applied if: `! empty($value) || $value === false`.
 
 
 ### Strategies and ParameterFilters
@@ -157,16 +157,16 @@ You can define strategies for each filter parameter by adding a strategies metho
         return [
             // as a ParameterFilter instance
             'parameter_name_here' => new \Czim\Filter\ParameterFilters\SimpleString(),
-            
+
             // as a ParameterFilter class string
             'another_parameter'   => \Czim\Filter\ParameterFilters\SimpleString::class,
-            
+
             // as an anonymous function
             'yet_another'         => function($name, $value, $query) {
                                         return $query->where('some_column', '>', $value);
                                      },
-                                     
-            // as an array (passable to call_user_func()) 
+
+            // as an array (passable to call_user_func())
             'and_another'         => [ $this, 'someMethodYouDefined' ],
         ];
     }
@@ -187,11 +187,11 @@ As shown above, there are different ways to provide a callable method for filter
 
 A `ParameterFilter` is a class (any that implements the `ParameterFilterInterface`) which may be set as a filter strategy.
 The `apply()` method on this class will be called when the filter is applied.
-If the ParameterFilter is given as a string for the strategy, it will be instantiated at the moment the filter is applied.
+If the ParameterFilter is given as a string for the strategy, it will be instantiated when the filter is applied.
 
 Strategies may also be defined as closures or arrays (so long as they may be fed into a `call_user_func()`).
 The method called by this will receive the four parameters noted above.
- 
+
 Only if no strategy has been defined for a parameter, the callback method `applyParameter()` will be called on the filter itself.
 By default, an exception will occur.
 
@@ -211,15 +211,15 @@ Simply add the following method to your filter class:
     protected function applyParameter($name, $value, $query)
     {
         switch ($name) {
-        
+
             case 'parameter_name_here':
-                
+
                 // your implementation of the filter ...
                 return $query;
-                
+
             ...
         }
-        
+
         // as a safeguard, you can call the parent method,
         // which will throw exceptions for unhandled parameters
         parent::applyParameter($name, $value, $query);
@@ -241,9 +241,9 @@ The idea is to prevent your visitors from selecting a different brand only to fi
 `CountableFilters` help you to do this, by using currently set filters to generate counts for alternative options.
 Say you have brand X, Y and Z, and are filtering products only for brand X and only in a given price range.
 The countable filter makes it easy to get a list of how many products also have matches for the price range of brand Y and Z.
-  
+
 To set up a `CountableFilter`, set up the `Filter` as normal, but additionally configure `$countables` and `countStrategies()`.
-The counting strategies are similarly configurable/implementable as filtering strategies. 
+The counting strategies are similarly configurable/implementable as filtering strategies.
 
 The return value for `CountableFilter::count()` is an instance of `Czim\CountableResults`, which is basically a standard Laravel `Collection` instance.
 
@@ -262,7 +262,7 @@ Strategies may be defined for the effects of `count()` per parameter for your Co
     }
 ```
 
-The same methods for defining strategies are available as with the `strategies()` methods above: instances (of ParameterCounters in this case), strings, closures and arrays. 
+The same methods for defining strategies are available as with the `strategies()` methods above: instances (of ParameterCounters in this case), strings, closures and arrays.
 
 The fallback for parameters without defined strategies is `countParameter()`:
 
@@ -273,7 +273,7 @@ The fallback for parameters without defined strategies is `countParameter()`:
      */
     protected function countParameter($parameter, $query)
     {
-        // your implementation for each $parameter name 
+        // your implementation for each $parameter name
     }
 ```
 
@@ -283,7 +283,7 @@ The fallback for parameters without defined strategies is `countParameter()`:
 Just like ParameterFilters for `Filter`, ParameterCounters can be used as 'plugins' for your `CountableFilter`.
 
 ``` php
-    
+
     protected function countStrategies()
     {
         return [
@@ -316,13 +316,13 @@ In order to prevent duplicate joining of tables, the Filter class has a built in
     // the second parameter is an array of parameters that is passed on directly
     //     to Laravel's query builder join() method.
     $this->addJoin('keyname_for_your_join', [ 'table', 'column_a', '=', 'column_b' ]);
-    
+
     // or within a ParameterFilter apply() method, call it on the filter
     $filter->addJoin( ... , [ ... ]);
 ```
 
 Joins so added are automatically applied to the filter after all parameters are applied.
- 
+
 
 ### Global Filter Settings
 
@@ -336,14 +336,14 @@ Alternatively, you can define a filter parameter strategy as `Filter::SETTING`, 
     {
         return [
             ...
-            
+
             'global_setting_name' => static::SETTING
         ];
     }
 ```
 
 When a setting has been set in either way, you can check it with the `setting()` method.
-Note that the ParameterFilter/ParameterCounter also receives the `$filter` itself as a parameter and the method is public. 
+Note that the ParameterFilter/ParameterCounter also receives the `$filter` itself as a parameter and the method is public.
 
 If a setting has not been defined, the `setting()` method for it will return `null`.
 
