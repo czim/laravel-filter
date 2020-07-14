@@ -204,7 +204,7 @@ class FilterTest extends TestCase
     function it_throws_an_exception_if_a_strategy_string_is_not_instantiable()
     {
         $this->expectException(\Czim\Filter\Exceptions\ParameterStrategyInvalidException::class);
-        $this->expectExceptionMessageMatches('#uninstantiable_string_that_is_not_a_parameter_filter#i');
+        $this->expectExceptionMessageRegExp('#uninstantiable_string_that_is_not_a_parameter_filter#i');
 
         (new TestFilter([ 'invalid_strategy_string' => 'ignored' ]))
             ->apply(TestSimpleModel::query());
@@ -227,7 +227,7 @@ class FilterTest extends TestCase
     function it_throws_an_exception_if_an_instantiated_strategy_string_does_not_implement_parameterfilterinterface()
     {
         $this->expectException(\Czim\Filter\Exceptions\ParameterStrategyInvalidException::class);
-        $this->expectExceptionMessageMatches('#is not a?\s*ParameterFilter#i');
+        $this->expectExceptionMessageRegExp('#is not a?\s*ParameterFilter#i');
 
         (new TestFilter([ 'invalid_strategy_interface' => 'ignored' ]))
             ->apply(TestSimpleModel::query());
