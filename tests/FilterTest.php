@@ -17,7 +17,7 @@ class FilterTest extends TestCase
     const SECOND_FIELD = 'second_field';
 
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
     }

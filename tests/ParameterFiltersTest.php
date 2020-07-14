@@ -12,7 +12,7 @@ use Illuminate\Support\Collection;
 class ParameterFiltersTest extends TestCase
 {
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
     }
