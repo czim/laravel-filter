@@ -1,22 +1,13 @@
 <?php
+
 namespace Czim\Filter\Test;
 
 use Czim\Filter\Contracts\FilterDataInterface;
 use Czim\Filter\Exceptions\FilterDataValidationFailedException;
 use Czim\Filter\Test\Helpers\TestFilterData;
-use Illuminate\Contracts\Support\MessageBag;
-use Illuminate\Support\Collection;
-use InvalidArgumentException;
 
 class FilterDataTest extends TestCase
 {
-
-    protected function seedDatabase()
-    {
-        // don't need this
-    }
-
-
     // --------------------------------------------
     //      Instantiation / Init
     // --------------------------------------------
@@ -24,9 +15,9 @@ class FilterDataTest extends TestCase
     /**
      * @test
      */
-    function it_can_be_instantiated_with_array_data()
+    public function it_can_be_instantiated_with_array_data(): void
     {
-        $this->assertInstanceOf(
+        static::assertInstanceOf(
             FilterDataInterface::class,
             new TestFilterData([
                 'name'          => 'some name',
@@ -40,20 +31,7 @@ class FilterDataTest extends TestCase
     /**
      * @test
      */
-    function it_can_be_instantiated_with_arrayble_data()
-    {
-        $arrayable = new Collection([
-            'name'     => 'some name',
-            'relateds' => [1, 2, 3],
-        ]);
-
-        $this->assertInstanceOf(FilterDataInterface::class, new TestFilterData($arrayable));
-    }
-
-    /**
-     * @test
-     */
-    function it_throws_an_exception_if_invalid_data_is_passed_in()
+    public function it_throws_an_exception_if_invalid_data_is_passed_in(): void
     {
         // see if we get the messages correctly
         try {
@@ -64,11 +42,8 @@ class FilterDataTest extends TestCase
                 'with_inactive' => 'not even a boolean here',
             ]);
         } catch (FilterDataValidationFailedException $e) {
-
             $messages = $e->getMessages();
-
-            $this->assertInstanceOf(MessageBag::class, $messages, "Exception getMessages is not a MessageBag");
-            $this->assertCount(3, $messages, "Exception getMessages should have 3 messages");
+            static::assertCount(3, $messages, "Exception getMessages should have 3 messages");
         }
 
         $this->expectException(FilterDataValidationFailedException::class);
@@ -82,44 +57,35 @@ class FilterDataTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    function it_throws_an_exception_if_constructor_parameter_is_not_an_array_or_arrayable()
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        new TestFilterData(50 + 3932);
-    }
-
     // --------------------------------------------
     //      Getters, setters and defaults
     // --------------------------------------------
 
-
     /**
      * @test
      */
-    function it_sets_default_values_for_parameters_not_provided()
+    public function it_sets_default_values_for_parameters_not_provided(): void
     {
         $data = new TestFilterData([
             'name' => 'some name',
         ]);
 
         // check default
-        $this->assertSame(false, $data->getDefaults()['with_inactive'], "Defaults not correct for test");
+        static::assertFalse($data->getDefaults()['with_inactive'], 'Defaults not correct for test');
 
         // check whether default was set
-        $this->assertSame(false, $data->getParameterValue('with_inactive'), "Defaults were not set for parametervalues");
+        static::assertFalse($data->getParameterValue('with_inactive'), 'Defaults were not set for parametervalues');
     }
 
     /**
      * @test
      */
-    function it_accepts_custom_defaults_through_constructor_parameter()
+    public function it_accepts_custom_defaults_through_constructor_parameter(): void
     {
         $data = new TestFilterData(
-            [ 'name' => 'some name' ],
+            [
+                'name' => 'some name',
+            ],
             // custom defaults
             [
                 'name'          => null,
@@ -128,10 +94,9 @@ class FilterDataTest extends TestCase
         );
 
         // check default
-        $this->assertSame(true, $data->getDefaults()['with_inactive'], "Defaults not correct for test");
+        static::assertTrue($data->getDefaults()['with_inactive'], 'Defaults not correct for test');
 
         // check whether default was set
-        $this->assertSame(true, $data->getParameterValue('with_inactive'), "Defaults were not set for parametervalues");
+        static::assertTrue($data->getParameterValue('with_inactive'), 'Defaults were not set for parametervalues');
     }
-
 }

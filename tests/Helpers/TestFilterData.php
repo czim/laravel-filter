@@ -1,10 +1,14 @@
 <?php
+
 namespace Czim\Filter\Test\Helpers;
 
 use Czim\Filter\FilterData;
 
 class TestFilterData extends FilterData
 {
+    /**
+     * @var array<string string>
+     */
     protected $rules = [
         'name'                   => 'string',
         'relateds'               => 'array',
@@ -17,6 +21,9 @@ class TestFilterData extends FilterData
         'global_setting'         => 'string',
     ];
 
+    /**
+     * @var array<string, mixed>
+     */
     protected $defaults = [
         'name'          => null,
         'relateds'      => [],

@@ -1,15 +1,17 @@
 <?php
+
 namespace Czim\Filter\Test;
 
 use Czim\Filter\Test\Helpers\TranslatableConfig;
 use Illuminate\Database\DatabaseManager;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Schema;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
-    const TABLE_NAME_SIMPLE       = 'test_simple_models';
-    const TABLE_NAME_TRANSLATIONS = 'test_simple_model_translations';
-    const TABLE_NAME_RELATED      = 'test_related_models';
+    protected const TABLE_NAME_SIMPLE       = 'test_simple_models';
+    protected const TABLE_NAME_TRANSLATIONS = 'test_simple_model_translations';
+    protected const TABLE_NAME_RELATED      = 'test_related_models';
 
     /**
      * @var DatabaseManager
@@ -17,12 +19,9 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     protected $db;
 
     /**
-     * Define environment setup.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     * @return void
+     * @param Application $app
      */
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         // Setup default database to use sqlite :memory:
         $app['config']->set('database.default', 'testbench');
@@ -39,7 +38,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     }
 
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -48,10 +47,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     }
 
 
-    protected function migrateDatabase()
+    protected function migrateDatabase(): void
     {
-        //$db = $this->app->make('db');
-
         // model we can test anything but translations with
         Schema::create(self::TABLE_NAME_SIMPLE, function($table) {
             $table->increments('id');
@@ -82,8 +79,10 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             $table->string('translated_string', 255);
             $table->timestamps();
         });
-
     }
 
-    abstract protected function seedDatabase();
+    protected function seedDatabase(): void
+    {
+        // noop
+    }
 }

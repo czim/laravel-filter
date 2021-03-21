@@ -1,19 +1,19 @@
 <?php
+
 namespace Czim\Filter\Test;
 
 use Czim\Filter\Contracts\CountableFilterInterface;
-use Czim\Filter\CountableResults;
 use Czim\Filter\Test\Helpers\TestCountableFilter;
 use Czim\Filter\Test\Helpers\TestRelatedModel;
 use Czim\Filter\Test\Helpers\TestSimpleModel;
 
 class CountableFilterTest extends TestCase
 {
-    const TABLE_NAME   = 'test_simple_models';
-    const UNIQUE_FIELD = 'unique_field';
-    const SECOND_FIELD = 'second_field';
+    protected const TABLE_NAME   = 'test_simple_models';
+    protected const UNIQUE_FIELD = 'unique_field';
+    protected const SECOND_FIELD = 'second_field';
 
-    protected function seedDatabase()
+    protected function seedDatabase(): void
     {
         TestSimpleModel::create([
             'unique_field'          => '11',
@@ -81,14 +81,14 @@ class CountableFilterTest extends TestCase
     /**
      * @test
      */
-    function it_can_be_instantiated()
+    public function it_can_be_instantiated(): void
     {
-        $this->assertInstanceOf(
+        static::assertInstanceOf(
             CountableFilterInterface::class,
             new TestCountableFilter([])
         );
 
-        $this->assertInstanceOf(
+        static::assertInstanceOf(
             CountableFilterInterface::class,
             new TestCountableFilter([ 'name' => 'test' ])
         );
@@ -98,11 +98,11 @@ class CountableFilterTest extends TestCase
     /**
      * @test
      */
-    function it_returns_list_of_countable_parameter_names()
+    public function it_returns_list_of_countable_parameter_names(): void
     {
         $filter = new TestCountableFilter([]);
 
-        $this->assertCount(
+        static::assertCount(
             2,
             $filter->getCountables(),
             "Wrong count for getCountables()"
@@ -117,24 +117,23 @@ class CountableFilterTest extends TestCase
     /**
      * @test
      */
-    function it_returns_correct_counts()
+    public function it_returns_correct_counts(): void
     {
         $filter = new TestCountableFilter([]);
 
         $counts = $filter->getCounts();
 
-        $this->assertInstanceOf(CountableResults::class, $counts, "getCounts() result is of wrong type");
-        $this->assertCount(2, $counts, "getCounts() results should have 2 items");
+        static::assertCount(2, $counts, "getCounts() results should have 2 items");
 
         // position 14 appears twice, 0 and 1 once
-        $this->assertEquals(
+        static::assertEquals(
             [ 0 => 1,  1 => 1, 14 => 2 ],
             $counts->get('position')->toArray(),
             "getCounts() first (distinct value) results incorrect"
         );
 
         // related model id 1 appears twice, the rest once
-        $this->assertEquals(
+        static::assertEquals(
             [ 1 => 2,  2 => 1, 3 => 1 ],
             $counts->get('relateds')->toArray(),
             "getCounts() first (belongsto) results incorrect"
@@ -149,7 +148,7 @@ class CountableFilterTest extends TestCase
     /**
      * @test
      */
-    function it_returns_only_unignored_countable_results()
+    public function it_returns_only_unignored_countable_results(): void
     {
         $filter = new TestCountableFilter([]);
 
@@ -157,10 +156,10 @@ class CountableFilterTest extends TestCase
 
         $counts = $filter->getCounts();
 
-        $this->assertCount(1, $counts, "getCounts() results should have 1 item (the other is ignored)");
+        static::assertCount(1, $counts, "getCounts() results should have 1 item (the other is ignored)");
 
         // position 14 appears twice, 0 and 1 once
-        $this->assertEquals(
+        static::assertEquals(
             [ 0 => 1,  1 => 1, 14 => 2 ],
             $counts->get('position')->toArray(),
             "getCounts() result should be correct position only"
@@ -168,26 +167,26 @@ class CountableFilterTest extends TestCase
 
 
         // after unignoring, all countables should be there
-        $filter->unignoreCountable( ['relateds'] );
+        $filter->unignoreCountable('relateds');
 
         $counts = $filter->getCounts();
 
-        $this->assertCount(2, $counts, "getCounts() results should have 2 items after unignoring countable");
+        static::assertCount(2, $counts, "getCounts() results should have 2 items after unignoring countable");
     }
 
     /**
      * @test
      */
-    function it_returns_counts_for_selected_keys_only()
+    public function it_returns_counts_for_selected_keys_only(): void
     {
         $filter = new TestCountableFilter([]);
 
         $counts = $filter->getCounts([ 'position' ]);
 
-        $this->assertCount(1, $counts, "getCounts() results should have 1 item (the other is ignored)");
+        static::assertCount(1, $counts, "getCounts() results should have 1 item (the other is ignored)");
 
         // position 14 appears twice, 0 and 1 once
-        $this->assertEquals(
+        static::assertEquals(
             [ 0 => 1,  1 => 1, 14 => 2 ],
             $counts->get('position')->toArray(),
             "getCounts() result should be correct position only"

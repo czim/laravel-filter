@@ -1,10 +1,16 @@
 <?php
+
 namespace Czim\Filter\Test\Helpers;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TestSimpleModel extends Model
 {
+    /**
+     * @var string[]
+     */
     protected $fillable = [
         'unique_field',
         'second_field',
@@ -14,12 +20,12 @@ class TestSimpleModel extends Model
         'active',
     ];
 
-    public function RelatedModel()
+    public function RelatedModel(): BelongsTo
     {
         return $this->belongsTo(TestRelatedModel::class);
     }
 
-    public function RelatedModels()
+    public function RelatedModels(): HasMany
     {
         return $this->hasMany(TestRelatedModel::class);
     }

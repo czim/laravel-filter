@@ -1,10 +1,13 @@
 <?php
+
 namespace Czim\Filter\Test\Helpers;
 
 class TranslatableConfig
 {
-
-    public function getConfig()
+    /**
+     * @return array<string, mixed>
+     */
+    public function getConfig(): array
     {
         return [
 
@@ -78,7 +81,6 @@ class TranslatableConfig
             |
             */
             'always_fillable'    => false,
-
         ];
     }
 }

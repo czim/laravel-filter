@@ -1,10 +1,14 @@
 <?php
+
 namespace Czim\Filter\Test\Helpers;
 
 use Czim\Filter\FilterData;
 
 class TestCountableFilterData extends FilterData
 {
+    /**
+     * @var array<string, string>
+     */
     protected $rules = [
         'name'                   => 'string',
         'relateds'               => 'array',
@@ -12,6 +16,9 @@ class TestCountableFilterData extends FilterData
         'with_inactive'          => 'boolean',
     ];
 
+    /**
+     * @var array<string, mixed>
+     */
     protected $defaults = [
         'name'          => null,
         'relateds'      => [],

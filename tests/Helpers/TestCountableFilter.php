@@ -1,4 +1,5 @@
 <?php
+
 namespace Czim\Filter\Test\Helpers;
 
 use Czim\Filter\CountableFilter;
@@ -7,12 +8,25 @@ use Czim\Filter\ParameterCounters;
 
 class TestCountableFilter extends CountableFilter
 {
-
     // Filter methods / configuration
 
+    /**
+     * @var string
+     */
     protected $filterDataClass = TestCountableFilterData::class;
 
-    protected function strategies()
+    /**
+     * @var string[]
+     */
+    protected $countables = [
+        'position',
+        'relateds',
+    ];
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function strategies(): array
     {
         return [
             'name'     => new ParameterFilters\SimpleString(),
@@ -21,13 +35,17 @@ class TestCountableFilter extends CountableFilter
         ];
     }
 
-    protected function applyParameter($name, $value, $query)
+    /**
+     * @param string                                $name
+     * @param mixed                                 $value
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     */
+    protected function applyParameter(string $name, $value, $query)
     {
-        // typical with inactive lookup
-        // make sure we don't get the the 'no fallback strategy' exception
-        if ($name == 'with_inactive') {
-
-            if ( ! $value) {
+        // Typical with inactive lookup.
+        // Make sure we don't get the the 'no fallback strategy' exception.
+        if ($name === 'with_inactive') {
+            if (! $value) {
                 $query->where('active', true);
             }
 
@@ -37,20 +55,17 @@ class TestCountableFilter extends CountableFilter
         parent::applyParameter($name, $value, $query);
     }
 
-
     // CountableFilter methods / configuration
 
-    protected $countables = [
-        'position',
-        'relateds',
-    ];
-
-    protected function getCountableBaseQuery($parameter = null)
+    protected function getCountableBaseQuery(?string $parameter = null)
     {
         return TestSimpleModel::query();
     }
 
-    protected function countStrategies()
+    /**
+     * @return array<string, mixed>
+     */
+    protected function countStrategies(): array
     {
         return [
             'position' => new ParameterCounters\SimpleDistinctValue(),
@@ -58,7 +73,7 @@ class TestCountableFilter extends CountableFilter
         ];
     }
 
-    protected function countParameter($parameter, $query)
+    protected function countParameter(string $parameter, $query)
     {
         parent::countParameter($parameter, $query);
     }

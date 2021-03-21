@@ -1,10 +1,16 @@
 <?php
+
 namespace Czim\Filter\Test\Helpers;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TestRelatedModel extends Model
 {
+    /**
+     * @var string[]
+     */
     protected $fillable = [
         'name',
         'some_property',
@@ -14,12 +20,12 @@ class TestRelatedModel extends Model
 
     // some relations for testing
 
-    public function TestSimpleModel()
+    public function TestSimpleModel(): BelongsTo
     {
         return $this->belongsTo(TestSimpleModel::class);
     }
 
-    public function TestSimpleModels()
+    public function TestSimpleModels(): HasMany
     {
         return $this->hasMany(TestSimpleModel::class);
     }
