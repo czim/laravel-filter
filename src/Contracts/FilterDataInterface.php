@@ -1,42 +1,33 @@
 <?php
+
 namespace Czim\Filter\Contracts;
 
-interface FilterDataInterface
+use Illuminate\Contracts\Support\Arrayable;
+
+interface FilterDataInterface extends Arrayable
 {
-
     /**
-     * Get the instance as an array.
+     * Returns the default values for each applicable attribute.
      *
-     * @return array
+     * @return array<string, mixed>
      */
-    public function toArray();
+    public function getDefaults(): array;
 
     /**
-     * Returns the default values for each applicable attribute
+     * Gets the attribute names which may be applied.
      *
-     * @return array
+     * @return string[]
      */
-    public function getDefaults();
+    public function getApplicableAttributes(): array;
 
     /**
-     * Gets the attribute names which may be applied
-     *
-     * @return array
-     */
-    public function getApplicableAttributes();
-
-    /**
-     * Gets the value for a parameter
-     *
-     * @param $name
+     * @param string $name
      * @return mixed
      */
-    public function getParameterValue($name);
+    public function getParameterValue(string $name);
 
     /**
-     * Getter for attributes
-     *
-     * @return array
+     * @return array<string, mixed>
      */
-    public function getAttributes();
+    public function getAttributes(): array;
 }

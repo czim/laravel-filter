@@ -1,6 +1,8 @@
 <?php
+
 namespace Czim\Filter\Traits;
 
+use Illuminate\Contracts\Support\MessageBag as MessageBagContract;
 use Illuminate\Support\MessageBag;
 use Validator;
 
@@ -16,37 +18,25 @@ use Validator;
 trait Validatable
 {
     /**
-     * Validator instance
-     *
-     * @var Validator
+     * @var Validator|null
      */
-    protected $validator = null;
+    protected $validator;
 
 
-    /**
-     * Validates the filter data
-     *
-     * @return boolean
-     */
-    public function validate()
+    public function validate(): bool
     {
         $this->validator = Validator::make($this->getAttributes(), $this->getRules());
 
         return ! $this->validator->fails();
     }
 
-    /**
-     * Returns validation errors, if any
-     *
-     * @return \Illuminate\Contracts\Support\MessageBag
-     */
-    public function messages()
+    public function messages(): MessageBagContract
     {
-        if (is_null($this->validator)) {
+        if ($this->validator === null) {
             $this->validate();
         }
 
-        if ( ! $this->validator->fails()) {
+        if (! $this->validator->fails()) {
             return app(MessageBag::class);
         }
 
@@ -54,11 +44,9 @@ trait Validatable
     }
 
     /**
-     * Accessor method to check for validation data set
-     *
-     * @return array
+     * @return array<string, mixed>
      */
-    public function getRules()
+    public function getRules(): array
     {
         if (isset($this->rules)) {
             return $this->rules;
@@ -68,13 +56,10 @@ trait Validatable
     }
 
     /**
-     * Setter for $rules
-     *
-     * @param array $rules
+     * @param array<string, mixed> $rules
      */
-    public function setRules(array $rules)
+    public function setRules(array $rules): void
     {
         $this->rules = $rules;
     }
-
 }

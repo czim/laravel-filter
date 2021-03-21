@@ -1,28 +1,27 @@
 <?php
+
 namespace Czim\Filter;
 
 use Czim\Filter\Exceptions\FilterDataValidationFailedException;
-use Illuminate\Contracts\Support\Arrayable;
-use InvalidArgumentException;
 
 /**
- * Data object that have the settings that Filters need to apply
+ * Data object that have the settings that Filters need to apply.
  */
-class FilterData implements Contracts\FilterDataInterface, Contracts\ValidatableTraitInterface, Arrayable
+class FilterData implements Contracts\FilterDataInterface, Contracts\ValidatableTraitInterface
 {
     use Traits\Validatable;
 
     /**
-     * Validatable filter data: used by ValidatableTrait
+     * Validatable filter data: used by ValidatableTrait.
      *
-     * @var array   associative
+     * @var array<string, mixed>
      */
     protected $attributes = [];
 
     /**
-     * Validation rules for filter
+     * Validation rules for filter.
      *
-     * @var array
+     * @var array<string, mixed>
      */
     protected $rules = [];
 
@@ -30,85 +29,52 @@ class FilterData implements Contracts\FilterDataInterface, Contracts\Validatable
      * Default values. Anything NOT listed here will NOT be applied in queries.
      * Make sure there are defaults for every filterable attribute.
      *
-     * @var array   associative
+     * @var array<string, mixed>
      */
     protected $defaults = [];
 
 
     /**
-     * Constructor: validate filter data
+     * Constructor: validate filter data.
      *
-     * @param array|Arrayable $attributes
-     * @param array|Arrayable $defaults     if provided, overrides internal defaults
+     * @param array<string, mixed>      $attributes
+     * @param array<string, mixed>|null $defaults   if provided, overrides internal defaults
      * @throws FilterDataValidationFailedException
      */
-    public function __construct($attributes, $defaults = null)
+    public function __construct(array $attributes, ?array $defaults = null)
     {
-        // store attributes as an array
-        if (is_a($attributes, Arrayable::class)) {
-            $attributes = $attributes->toArray();
-        }
-
-        if (empty($attributes)) {
-            $attributes = [];
-        }
-
-        if ( ! is_array($attributes)) {
-            throw new InvalidArgumentException("FilterData constructor parameter was not an array or Arrayable");
-        }
-
-
-        // validate and sanitize the attribute values passed in
+        // Validate and sanitize the attribute values passed in.
         $this->attributes = $this->sanitizeAttributes($attributes);
 
         $this->validateAttributes();
 
-
-        // if default overrides are provided, save them
-        if ( ! empty($defaults)) {
-
-            if (is_a($defaults, Arrayable::class)) {
-                $defaults = $defaults->toArray();
-            }
-
-            if ( ! is_array($defaults)) {
-                throw new InvalidArgumentException("FilterData constructor parameter for defaults was not an array or Arrayable");
-            }
-
+        if ($defaults !== null) {
             $this->defaults = $defaults;
         }
 
-        // set attributes, filling in defaults
+        // Set attributes, filling in defaults.
         $this->attributes = array_merge($this->defaults, $this->attributes);
     }
 
-
-    /**
-     * Get the instance as an array.
-     *
-     * @return array
-     */
-    public function toArray()
+    public function toArray(): array
     {
         return $this->attributes;
     }
 
     /**
-     * Returns the default values for each applicable attribute
-     *
-     * @return array
+     * @return array<string, mixed>
      */
-    public function getDefaults()
+    public function getDefaults(): array
     {
         return $this->defaults;
     }
 
     /**
-     * Gets the attribute names which may be applied
+     * Gets the attribute names which may be applied.
      *
-     * @return array
+     * @return string[]
      */
-    public function getApplicableAttributes()
+    public function getApplicableAttributes(): array
     {
         return array_keys($this->defaults);
     }
@@ -118,55 +84,45 @@ class FilterData implements Contracts\FilterDataInterface, Contracts\Validatable
      *
      * Override this to apply sanitization to any attributes passed into the class.
      *
-     * @param array $attributes
-     * @return array
+     * @param array<string, mixed> $attributes
+     * @return array<string, mixed>
      */
-    protected function sanitizeAttributes(array $attributes)
+    protected function sanitizeAttributes(array $attributes): array
     {
         return $attributes;
     }
 
     /**
      * Validates currently set attributes (not including defaults)
-     * against the given validation rules
+     * against the given validation rules.
      *
      * @throws FilterDataValidationFailedException
      */
-    protected function validateAttributes()
+    protected function validateAttributes(): void
     {
         if (empty($this->getRules())) {
             return;
         }
 
-        if ( ! $this->validate()) {
-
+        if (! $this->validate()) {
             throw (new FilterDataValidationFailedException)->setMessages($this->messages());
         }
     }
 
     /**
-     * Gets the value for a parameter
-     *
      * @param string $name
      * @return mixed
      */
-    public function getParameterValue($name)
+    public function getParameterValue(string $name)
     {
-        if (isset($this->attributes[ $name ])) {
-            return $this->attributes[ $name ];
-        }
-
-        return null;
+        return $this->attributes[ $name ] ?? null;
     }
 
     /**
-     * Getter for attributes
-     *
-     * @return array
+     * @return array<string, mixed>
      */
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return $this->attributes;
     }
-
 }

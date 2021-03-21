@@ -1,4 +1,5 @@
 <?php
+
 namespace Czim\Filter\Enums;
 
 use MyCLabs\Enum\Enum;
@@ -8,8 +9,8 @@ use MyCLabs\Enum\Enum;
  */
 class JoinKey extends Enum
 {
-    const TRANSLATIONS = 'translations';
-    const PARENT       = 'parent';
-    const CHILDREN     = 'children';
-    const CHILD        = 'child';
+    public const TRANSLATIONS = 'translations';
+    public const PARENT       = 'parent';
+    public const CHILDREN     = 'children';
+    public const CHILD        = 'child';
 }

@@ -1,8 +1,9 @@
 <?php
+
 namespace Czim\Filter\Exceptions;
 
-use Exception;
+use RuntimeException;
 
-class FilterParameterUnhandledException extends Exception
+class FilterParameterUnhandledException extends RuntimeException
 {
 }

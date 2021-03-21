@@ -1,4 +1,5 @@
 <?php
+
 namespace Czim\Filter\ParameterCounters;
 
 use Czim\Filter\Contracts\CountableFilterInterface;
@@ -38,18 +39,18 @@ class SimpleDistinctValue implements ParameterCounterInterface
     protected $countAlias;
 
     /**
-     * @param null   $columnName        the column name to count
-     * @param bool   $includeEmpty      whether to also count for NULL, default is to exclude
-     * @param string $countRaw          the raw SQL count statement ('COUNT(*)')
-     * @param string $columnAlias       an alias for the column ('id')
-     * @param string $countAlias        an alias for the count ('count')
+     * @param string|null $columnName   the column name to count, always used unless null
+     * @param bool        $includeEmpty whether to also count for NULL, default is to exclude
+     * @param string      $countRaw     the raw SQL count statement ('COUNT(*)')
+     * @param string      $columnAlias  an alias for the column ('id')
+     * @param string      $countAlias   an alias for the count ('count')
      */
     public function __construct(
-        $columnName = null,
-        $includeEmpty = false,
-        $countRaw = 'COUNT(*)',
-        $columnAlias = 'value',
-        $countAlias = 'count'
+        ?string $columnName = null,
+        bool $includeEmpty = false,
+        string $countRaw = 'COUNT(*)',
+        string $columnAlias = 'value',
+        string $countAlias = 'count'
     ) {
         $this->columnName   = $columnName;
         $this->includeEmpty = $includeEmpty;
@@ -64,18 +65,13 @@ class SimpleDistinctValue implements ParameterCounterInterface
      * @param string                   $name
      * @param EloquentBuilder          $query
      * @param CountableFilterInterface $filter
-     * @return array|Collection
+     * @return Collection<string, int>
      */
-    public function count($name, $query, CountableFilterInterface $filter)
+    public function count(string $name, $query, CountableFilterInterface $filter)
     {
-        // if the columnname is not set, assume an id field based on a table name
-        if (empty($this->columnName)) {
-            $columnName = $name;
-        } else {
-            $columnName = $this->columnName;
-        }
+        $columnName = $this->determineColumnName($name);
 
-        if ( ! $this->includeEmpty) {
+        if (! $this->includeEmpty) {
             $query->whereNotNull($columnName);
         }
 
@@ -85,5 +81,15 @@ class SimpleDistinctValue implements ParameterCounterInterface
             )
             ->groupBy($columnName)
             ->pluck($this->countAlias, $this->columnAlias);
+    }
+
+    protected function determineColumnName(string $name): string
+    {
+        // If the columnname is not set, assume an id field based on a table name.
+        if (empty($this->columnName)) {
+            return $name;
+        }
+
+        return $this->columnName;
     }
 }

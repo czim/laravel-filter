@@ -1,4 +1,5 @@
 <?php
+
 namespace Czim\Filter;
 
 use Czim\Filter\Contracts\CountableFilterInterface;
@@ -9,6 +10,7 @@ use Czim\Filter\Exceptions\ParameterStrategyInvalidException;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use ReflectionClass;
+use Throwable;
 
 /**
  * The point is to get an overview of things that may be alternatively filtered
@@ -39,7 +41,7 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
      *      null, which means that getCountForParameter() will be called on the Filter
      *          itself, which MUST then be able to handle it!
      *
-     * @var array   associative
+     * @var array<string, mixed> by countable name
      */
     protected $countStrategies = [];
 
@@ -66,14 +68,14 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
      * This will be called for each countable parameter, and could be
      * something like: EloquentModelName::query();
      *
-     * @param string $parameter     name of the countable parameter
+     * @param string|null $parameter name of the countable parameter
      * @return EloquentBuilder
      */
-    abstract protected function getCountableBaseQuery($parameter = null);
+    abstract protected function getCountableBaseQuery(?string $parameter = null);
 
 
     /**
-     * Constructs the relevant FilterData if one is not injected
+     * Constructs the relevant FilterData if one is not injected.
      *
      * @param array|Arrayable|FilterDataInterface $data
      */
@@ -85,22 +87,22 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
     }
 
     /**
-     * Sets initial strategies for counting countables
+     * Initializes strategies for counting countables
      * Override this to set the countable strategies for your filter.
      *
-     * @return array
+     * @return array<string, mixed>
      */
-    protected function countStrategies()
+    protected function countStrategies(): array
     {
         return [];
     }
 
     /**
-     * Returns a list of the countable parameters to get counts for
+     * Returns a list of the countable parameters to get counts for.
      *
-     * @return array
+     * @return string[]
      */
-    public function getCountables()
+    public function getCountables(): array
     {
         return $this->countables;
     }
@@ -108,9 +110,9 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
     /**
      * Returns a list of the countable parameters that are not ignored
      *
-     * @return array
+     * @return string[]
      */
-    protected function getActiveCountables()
+    protected function getActiveCountables(): array
     {
         return array_diff($this->getCountables(), $this->ignoreCountables);
     }
@@ -118,73 +120,67 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
     /**
      * Gets alternative counts per (relevant) attribute for the filter data.
      *
-     * @param array $countables     overrides ignoredCountables
+     * @param string[] $countables  overrides ignoredCountables
      * @return CountableResults
      * @throws ParameterStrategyInvalidException
      */
-    public function getCounts($countables = [])
+    public function getCounts(array $countables = []): CountableResults
     {
-        $counts = new CountableResults;
+        $counts = new CountableResults();
 
         $strategies = $this->buildCountableStrategies();
 
-        // determine which countables to count for
-        if ( ! empty($countables)) {
+        // Determine which countables to count for
+        if (! empty($countables)) {
             $countables = array_intersect($this->getCountables(), $countables);
         } else {
             $countables = $this->getActiveCountables();
         }
 
         foreach ($countables as $parameterName) {
-
             // should we skip it no matter what?
             if ($this->isCountableIgnored($parameterName)) {
                 continue;
             }
 
-            if (isset($strategies[ $parameterName ])) {
+            if (isset($strategies[$parameterName])) {
                 $strategy = $strategies[ $parameterName ];
             } else {
                 $strategy = null;
             }
 
             // normalize the strategy so that we can call_user_func on it
-            if (is_a($strategy, ParameterCounterInterface::class)) {
-
+            if ($strategy instanceof ParameterCounterInterface) {
                 $strategy = [ $strategy, 'count' ];
-
-            } elseif (is_null($strategy)) {
+            } elseif ($strategy === null) {
                 // default, let it be handled by applyParameter
-
                 $strategy = [ $this, 'countParameter' ];
-
-            } elseif ( ! is_callable($strategy)) {
-
+            } elseif (! is_callable($strategy)) {
                 throw new ParameterStrategyInvalidException(
                     "Invalid counting strategy defined for parameter '{$parameterName}',"
                     . " must be ParameterFilterInterface, classname, callable or null"
                 );
             }
 
-            // start with a fresh query
+            // start with a fresh query.
             $query = $this->getCountableBaseQuery();
 
             // apply the filter while temporarily ignoring the current countable parameter,
-            // unless it is forced to be included
+            // unless it is forced to be included.
             $includeSelf = in_array($parameterName, $this->includeSelfInCount);
 
-            if ( ! $includeSelf) {
+            if (! $includeSelf) {
                 $this->ignoreParameter($parameterName);
             }
 
             $this->apply($query);
 
-            if ( ! $includeSelf) {
+            if (! $includeSelf) {
                 $this->unignoreParameter($parameterName);
             }
 
             // retrieve the count and put it in the results
-            $counts->put($parameterName, call_user_func_array($strategy, [$parameterName, $query, $this]));
+            $counts->put($parameterName, $strategy($parameterName, $query, $this));
         }
 
         return $counts;
@@ -201,39 +197,36 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
      * @return mixed
      * @throws FilterParameterUnhandledException
      */
-    protected function countParameter($parameter, $query)
+    protected function countParameter(string $parameter, $query)
     {
-        // default is to always warn that we don't have a strategy
-        throw new FilterParameterUnhandledException("No fallback strategy determined for for countable parameter '{$parameter}'");
+        // Default is to always warn that we don't have a strategy
+        throw new FilterParameterUnhandledException(
+            "No fallback strategy determined for for countable parameter '{$parameter}'"
+        );
     }
 
     /**
      * Builds up the strategies so that all instantiatable strategies are instantiated
      *
-     * @return array
+     * @return array<string, mixed>
      * @throws ParameterStrategyInvalidException
      */
-    protected function buildCountableStrategies()
+    protected function buildCountableStrategies(): array
     {
         foreach ($this->countStrategies as &$strategy) {
-
             // check if the strategy is a string that should be instantiated as a class
             if (is_string($strategy)) {
-
                 try {
-
                     $reflection = new ReflectionClass($strategy);
 
-                    if ( ! $reflection->isInstantiable()) {
+                    if (! $reflection->isInstantiable()) {
                         throw new ParameterStrategyInvalidException(
                             "Uninstantiable string provided as countStrategy for '{$strategy}'"
                         );
                     }
 
                     $strategy = new $strategy();
-
-                } catch (\Exception $e) {
-
+                } catch (Throwable $e) {
                     throw new ParameterStrategyInvalidException(
                         'Exception thrown while trying to reflect or instantiate string '
                         . "provided as countStrategy for '{$strategy}'",
@@ -242,9 +235,8 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
                     );
                 }
 
-                // check if it is of the correct type
-                if ( ! is_a($strategy, ParameterCounterInterface::class)) {
-
+                // Check if it is of the correct type.
+                if (! $strategy instanceof ParameterCounterInterface) {
                     throw new ParameterStrategyInvalidException(
                         "Instantiated string provided is not a ParameterFilter: '" . get_class($strategy) . "'"
                     );
@@ -258,49 +250,49 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
     }
 
     /**
-     * Disables one or more countables when getCounts() is invoked.
+     * Disables a countable when getCounts() is invoked.
      *
      * Note that this differs from ignoreParameter in that the count itself is omitted, but it does not
      * affect what parameters get applied to the queries for the other countables!
      *
-     * @param string|array $countable
-     * @return $this
+     * @param string $countable
      */
-    public function ignoreCountable($countable)
+    public function ignoreCountable(string $countable): void
     {
-        if ( ! is_array($countable)) {
-            $countable = [ $countable];
-        }
-
-        $this->ignoreCountables = array_merge($this->ignoreCountables, $countable);
-
-        return $this;
+        $this->ignoreCountables = array_merge($this->ignoreCountables, [$countable]);
     }
 
     /**
-     * Re-enables one or more countables when getCounts() is invoked
+     * Disables a number of countables when getCounts() is invoked.
      *
-     * @param string|array $countable
-     * @return $this
+     * @param string[] $countables
      */
-    public function unignoreCountable($countable)
+    public function ignoreCountables(array $countables): void
     {
-        if ( ! is_array($countable)) {
-            $countable = [ $countable];
-        }
-
-        $this->ignoreCountables = array_diff($this->ignoreCountables, $countable);
-
-        return $this;
+        array_map([$this, 'ignoreCountable'], $countables);
     }
 
     /**
-     * Returns whether a given countable is currently being ignored/omitted
+     * Re-enables a countable when getCounts() is invoked.
      *
-     * @param string $countableName
-     * @return bool
+     * @param string $countable
      */
-    public function isCountableIgnored($countableName)
+    public function unignoreCountable(string $countable): void
+    {
+        $this->ignoreCountables = array_diff($this->ignoreCountables, [$countable]);
+    }
+
+    /**
+     * Re-enables a number of countables when getCounts() is invoked.
+     *
+     * @param string[] $countables
+     */
+    public function unignoreCountables(array $countables): void
+    {
+        array_map([$this, 'unignoreCountable'], $countables);
+    }
+
+    public function isCountableIgnored(string $countableName): bool
     {
         if (empty($this->ignoreCountables)) {
             return false;
@@ -308,5 +300,4 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
 
         return in_array($countableName, $this->ignoreCountables, true);
     }
-
 }

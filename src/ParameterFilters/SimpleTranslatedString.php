@@ -1,4 +1,5 @@
 <?php
+
 namespace Czim\Filter\ParameterFilters;
 
 use Czim\Filter\Contracts\FilterInterface;
@@ -21,21 +22,20 @@ use Illuminate\Support\Str;
  */
 class SimpleTranslatedString implements ParameterFilterInterface
 {
-    const TRANSLATION_TABLE_POSTFIX = '_translations';
-
+    protected const TRANSLATION_TABLE_POSTFIX = '_translations';
 
     /**
-     * @var null
+     * @var string
      */
     protected $table;
 
     /**
-     * @var null
+     * @var string|null
      */
     protected $translationTable;
 
     /**
-     * @var null
+     * @var string|null
      */
     protected $column;
 
@@ -45,21 +45,25 @@ class SimpleTranslatedString implements ParameterFilterInterface
     protected $exact;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $locale;
 
 
     /**
-     * @param string $table
-     * @param string $translationTable
-     * @param string $column if given, overrules the attribute name
-     * @param string $locale
-     * @param bool   $exact  whether this should not be a loosy comparison
+     * @param string      $table
+     * @param string|null $translationTable
+     * @param string|null $column           if given, overrules the attribute name
+     * @param string|null $locale
+     * @param bool        $exact            whether this should not be a loosy comparison
      */
-    public function __construct($table, $translationTable = null, $column = null, $locale = null, $exact = false)
-    {
-        // translated table name to translations version
+    public function __construct(
+        string $table,
+        ?string $translationTable = null,
+        ?string $column = null,
+        ?string $locale = null,
+        bool $exact = false
+    ) {
         if (empty($translationTable)) {
             $translationTable = Str::singular($table) . self::TRANSLATION_TABLE_POSTFIX;
         }
@@ -72,32 +76,30 @@ class SimpleTranslatedString implements ParameterFilterInterface
         $this->translationTable = $translationTable;
         $this->column           = $column;
         $this->locale           = $locale;
-        $this->exact            = (bool) $exact;
+        $this->exact            = $exact;
     }
 
     /**
-     * Applies parameter filtering for a given query
-     *
      * @param string          $name
      * @param mixed           $value
      * @param EloquentBuilder $query
      * @param FilterInterface $filter
      * @return EloquentBuilder
      */
-    public function apply($name, $value, $query, FilterInterface $filter)
+    public function apply(string $name, $value, $query, FilterInterface $filter)
     {
         $column = $this->translationTable . '.'
-                . ( ! empty($this->column) ? $this->column : $name);
+            . (! empty($this->column) ? $this->column : $name);
 
         $operator = '=';
 
-        if ( ! $this->exact) {
+        if (! $this->exact) {
             $operator = 'LIKE';
             $value    = '%' . $value . '%';
         }
 
         $query->where($this->translationTable . '.locale', $this->locale)
-              ->where($column, $operator, $value);
+            ->where($column, $operator, $value);
 
 
         // add a join for the translations

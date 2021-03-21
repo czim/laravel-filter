@@ -1,10 +1,11 @@
 <?php
+
 namespace Czim\Filter\Exceptions;
 
-use Exception;
 use Illuminate\Contracts\Support\MessageBag;
+use RuntimeException;
 
-class FilterDataValidationFailedException extends Exception
+class FilterDataValidationFailedException extends RuntimeException
 {
     /**
      * @var MessageBag
@@ -13,19 +14,16 @@ class FilterDataValidationFailedException extends Exception
 
     /**
      * @param MessageBag $messages
-     * @return $this
+     * @return FilterDataValidationFailedException|$this
      */
-    public function setMessages(MessageBag $messages)
+    public function setMessages(MessageBag $messages): FilterDataValidationFailedException
     {
         $this->messages = $messages;
 
         return $this;
     }
 
-    /**
-     * @return MessageBag
-     */
-    public function getMessages()
+    public function getMessages(): MessageBag
     {
         return $this->messages;
     }

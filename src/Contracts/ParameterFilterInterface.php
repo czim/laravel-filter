@@ -1,4 +1,5 @@
 <?php
+
 namespace Czim\Filter\Contracts;
 
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
@@ -14,6 +15,6 @@ interface ParameterFilterInterface
      * @param FilterInterface $filter
      * @return EloquentBuilder
      */
-    public function apply($name, $value, $query, FilterInterface $filter);
+    public function apply(string $name, $value, $query, FilterInterface $filter);
 
 }

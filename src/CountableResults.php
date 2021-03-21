@@ -1,4 +1,5 @@
 <?php
+
 namespace Czim\Filter;
 
 use Illuminate\Support\Collection;

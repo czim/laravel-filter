@@ -1,4 +1,5 @@
 <?php
+
 namespace Czim\Filter\ParameterFilters;
 
 use Czim\Filter\Contracts\FilterInterface;
@@ -8,14 +9,13 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
 class SimpleInteger implements ParameterFilterInterface
 {
-
     /**
-     * @var null
+     * @var string|null
      */
     protected $table;
 
     /**
-     * @var null
+     * @var string|null
      */
     protected $column;
 
@@ -25,11 +25,11 @@ class SimpleInteger implements ParameterFilterInterface
     protected $operator;
 
     /**
-     * @param string $table
-     * @param string $column   if given, overrules the attribute name
-     * @param string $operator
+     * @param string|null $table
+     * @param string|null $column if given, overrules the attribute name
+     * @param string      $operator
      */
-    public function __construct($table = null, $column = null, $operator = '=')
+    public function __construct(?string $table = null, ?string $column = null, string $operator = '=')
     {
         $this->table    = $table;
         $this->column   = $column;
@@ -37,32 +37,28 @@ class SimpleInteger implements ParameterFilterInterface
     }
 
     /**
-     * Applies parameter filtering for a given query
-     *
      * @param string          $name
      * @param mixed           $value
      * @param EloquentBuilder $query
      * @param FilterInterface $filter
      * @return EloquentBuilder
      */
-    public function apply($name, $value, $query, FilterInterface $filter)
+    public function apply(string $name, $value, $query, FilterInterface $filter)
     {
-        $column = ( ! empty($this->table) ? $this->table . '.' : null)
-                . ( ! empty($this->column) ? $this->column : $name);
+        $column = (! empty($this->table) ? $this->table . '.' : null)
+            . (! empty($this->column) ? $this->column : $name);
 
 
         // an array of values: do a whereIn query
-        if (is_a($value, Arrayable::class)) {
+        if ($value instanceof Arrayable) {
             $value = $value->toArray();
         }
 
         if (is_array($value)) {
             $query->whereIn($column, $value);
-
             return $query;
         }
 
-        // otherwise, do a normal where
         return $query->where($column, $this->operator, $value);
     }
 }

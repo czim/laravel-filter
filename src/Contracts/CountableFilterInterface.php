@@ -1,4 +1,5 @@
 <?php
+
 namespace Czim\Filter\Contracts;
 
 use Czim\Filter\CountableResults;
@@ -6,35 +7,47 @@ use Czim\Filter\CountableResults;
 interface CountableFilterInterface extends FilterInterface
 {
     /**
-     * Returns a list of the countable parameters to get counts for
+     * Returns a list of the countable parameters to get counts for.
      *
-     * @return array
+     * @return array<string, mixed>
      */
-    public function getCountables();
+    public function getCountables(): array;
 
     /**
      * Gets alternative counts per (relevant) attribute for the filter data.
      *
-     * @param array $countables     if provided, limits the result to theses countables
+     * @param string[] $countables when provided, limits the result to theses countables
      * @return CountableResults
      */
-    public function getCounts($countables = []);
+    public function getCounts(array $countables = []): CountableResults;
 
     /**
-     * Disables one or more countables when getCounts() is invoked
+     * Disables a countable when getCounts() is invoked.
      *
-     * @param string|array $countable
-     * @return $this
+     * @param string $countable
      */
-    public function ignoreCountable($countable);
+    public function ignoreCountable(string $countable): void;
 
     /**
-     * Re-enables one or more countables when getCounts() is invoked
+     * Disables a number of countables when getCounts() is invoked.
      *
-     * @param string|array $countable
-     * @return $this
+     * @param string[] $countables
      */
-    public function unignoreCountable($countable);
+    public function ignoreCountables(array $countables): void;
+
+    /**
+     * Re-enables a countable when getCounts() is invoked.
+     *
+     * @param string $countable
+     */
+    public function unignoreCountable(string $countable): void;
+
+    /**
+     * Re-enables a number of countables when getCounts() is invoked.
+     *
+     * @param string[] $countables
+     */
+    public function unignoreCountables(array $countables): void;
 
     /**
      * Returns whether a given countable is currently being ignored/omitted
@@ -42,5 +55,5 @@ interface CountableFilterInterface extends FilterInterface
      * @param string $countableName
      * @return bool
      */
-    public function isCountableIgnored($countableName);
+    public function isCountableIgnored(string $countableName): bool;
 }

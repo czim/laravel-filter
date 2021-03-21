@@ -1,8 +1,9 @@
 <?php
+
 namespace Czim\Filter\Exceptions;
 
-use Exception;
+use RuntimeException;
 
-class ParameterStrategyInvalidException extends Exception
+class ParameterStrategyInvalidException extends RuntimeException
 {
 }

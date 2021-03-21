@@ -1,37 +1,28 @@
 <?php
+
 namespace Czim\Filter\Contracts;
 
 use Illuminate\Contracts\Support\MessageBag;
 
 interface ValidatableTraitInterface
 {
-    /**
-     * Validate attributes
-     *
-     * @return boolean
-     */
-    public function validate();
+    public function validate(): bool;
 
     /**
-     * If validation tried and failed, returns validation messages
+     * If validation tried and failed, returns validation messages.
      *
      * @return MessageBag
      */
-    public function messages();
+    public function messages(): MessageBag;
 
     /**
-     * Returns currently set validation rules
-     *
-     * @return array
+     * @return array<string, mixed>
      */
-    public function getRules();
+    public function getRules(): array;
 
     /**
-     * Sets validation rules
-     *
-     * @param array $rules
-     * @return void
+     * @param array<string, mixed> $rules
      */
-    public function setRules(array $rules);
+    public function setRules(array $rules): void;
 
 }
