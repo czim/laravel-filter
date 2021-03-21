@@ -23,6 +23,9 @@ This is not a ready-to-use package, but a framework you can extend for your own 
  5.8 and below | 1.1
  6.0 and up    | 2.0
 
+## Changelog
+
+[Changelog here](CHANGELOG.md).
 
 ## Install
 
