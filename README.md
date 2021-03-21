@@ -156,7 +156,7 @@ Regardless of the method you choose to make your filter application, it will *on
 You can define strategies for each filter parameter by adding a strategies method to your filter as follows:
 
 ``` php
-    protected function strategies()
+    protected function strategies(): array
     {
         return [
             // as a ParameterFilter instance
@@ -186,7 +186,7 @@ As shown above, there are different ways to provide a callable method for filter
      * @param EloquentBuilder $query
      * @param FilterInterface $filter   the filter from which the strategy was invoked
      */
-    public function apply($name, $value, $query);
+    public function apply(string $name, $value, $query);
 ```
 
 A `ParameterFilter` is a class (any that implements the `ParameterFilterInterface`) which may be set as a filter strategy.
@@ -212,7 +212,7 @@ If you prefer, you can also use the fallback method to handle any or all of the 
 Simply add the following method to your filter class:
 
 ``` php
-    protected function applyParameter($name, $value, $query)
+    protected function applyParameter(string $name, $value, $query)
     {
         switch ($name) {
 
@@ -257,7 +257,7 @@ The return value for `CountableFilter::count()` is an instance of `Czim\Countabl
 Strategies may be defined for the effects of `count()` per parameter for your CountableFilter, in the same way as normal filter strategies.
 
 ``` php
-    protected function countStrategies()
+    protected function countStrategies(): array
     {
         return [
             'parameter_name_here' => new \Czim\Filter\ParameterCounters\SimpleInteger(),
@@ -275,7 +275,7 @@ The fallback for parameters without defined strategies is `countParameter()`:
      * @param string          $parameter countable name
      * @param EloquentBuilder $query
      */
-    protected function countParameter($parameter, $query)
+    protected function countParameter(string $parameter, $query)
     {
         // your implementation for each $parameter name
     }
@@ -288,7 +288,7 @@ Just like ParameterFilters for `Filter`, ParameterCounters can be used as 'plugi
 
 ``` php
 
-    protected function countStrategies()
+    protected function countStrategies(): array
     {
         return [
             'parameter_name_here' => new ParameterCounters\YourParameterCounter()
@@ -304,7 +304,7 @@ ParameterCounters must implement the `ParameterCounterInterface`, featuring this
      * @param EloquentBuilder          $query
      * @param CountableFilterInterface $filter
      */
-    public function count($name, $query, CountableFilterInterface $filter);
+    public function count(string $name, $query, CountableFilterInterface $filter);
 ```
 
 ## Settings and Extra stuff
@@ -336,7 +336,7 @@ Alternatively, you can define a filter parameter strategy as `Filter::SETTING`, 
 
 ``` php
     // in your Filter class:
-    protected function strategies()
+    protected function strategies(): array
     {
         return [
             ...

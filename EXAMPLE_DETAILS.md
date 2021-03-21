@@ -4,7 +4,7 @@
 // ..._create_products_table.php
 class CreateProductsTable extends Migration
 {
-    public function up()
+    public function up(): void
     {
         Schema::create('products', function (Blueprint $table) {
             $table->increments('id');
@@ -16,7 +16,7 @@ class CreateProductsTable extends Migration
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::drop('products');
     }
@@ -26,7 +26,7 @@ class CreateProductsTable extends Migration
 // ..._create_brands_table.php
 class CreateBrandsTable extends Migration
 {
-    public function up()
+    public function up(): void
     {
         Schema::create('brands', function (Blueprint $table) {
             $table->increments('id');
@@ -43,7 +43,7 @@ class CreateBrandsTable extends Migration
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::table('products', function(Blueprint $table) {
 
@@ -58,7 +58,7 @@ class CreateBrandsTable extends Migration
 // ..._create_categories_table.php
 class CreateCategoriesTable extends Migration
 {
-    public function up()
+    public function up(): void
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->increments('id');
@@ -84,7 +84,7 @@ class CreateCategoriesTable extends Migration
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::drop('category_product');
         Schema::drop('categories');
@@ -101,6 +101,8 @@ class CreateCategoriesTable extends Migration
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Product extends Model
 {
@@ -111,12 +113,12 @@ class Product extends Model
     ];
 
 
-    public function brand()
+    public function brand(): BelongsTo
     {
         return $this->belongsTo(Brand::class);
     }
 
-    public function categories()
+    public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class);
     }
@@ -131,6 +133,7 @@ class Product extends Model
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Brand extends Model
 {
@@ -138,7 +141,7 @@ class Brand extends Model
         'name',
     ];
 
-    public function products()
+    public function products(): HasMany
     {
         return $this->hasMany(Product::class);
     }
@@ -152,14 +155,15 @@ class Brand extends Model
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Category extends Model
 {
     protected $fillable = [
-        'name',    
+        'name',
     ];
 
-    public function products()
+    public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class);
     }

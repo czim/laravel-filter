@@ -17,15 +17,15 @@ What we want to be able to do is pass in the following array to a filter to get 
 ```
 
 So that, for instance, to find all products that have 'enhanced' in their name, you would provide:
- 
+
 ```php
      [
          'name' => 'enhanced',
      ]
  ```
- 
+
  Or to find all products belonging *either* to the category with id #3 *and/or* the categoy with id #4:
- 
+
  ```php
       [
           'categories' => [ 3, 4 ],
@@ -93,7 +93,7 @@ class ProductFilter extends Filter
     protected $filterDataClass = ProductData::class;
 
 
-    protected function strategies()
+    protected function strategies(): array
     {
         return [
             // Loosy string match
@@ -115,7 +115,7 @@ class ProductFilter extends Filter
      * @param mixed           $value
      * @param EloquentBuilder $query
      */
-    protected function applyParameter($name, $value, $query)
+    protected function applyParameter(string $name, $value, $query)
     {
         switch ($name) {
 
@@ -129,7 +129,7 @@ class ProductFilter extends Filter
                 // query builder when all filter parameters are applied.
                 // If you were to call addJoin with the same ('category_product') key name
                 // again, it would only be added to the query once.
-                
+
                 $this->addJoin('category_product', [
                     'category_product',
                     'category_product.product_id', '=', 'products.id'
@@ -161,10 +161,10 @@ For instance, you would pass in as filter data the following:
 And receive the alternative counts by calling `getCountables()` on the filter:
 
 ```php
-    // the toArray() of the CountResult returned: 
+    // the toArray() of the CountResult returned:
     [
         'brands' => [
-            1 => 2,     // For products belonging to either Category #3 or #4, 
+            1 => 2,     // For products belonging to either Category #3 or #4,
             2 => 1,     // there are two Products for Brand #1, one for #2
             4 => 10,    // and ten for Brand #4. None for #3 or any other, in this case.
         ],
@@ -202,24 +202,24 @@ And add the following to it:
      * @param string $parameter name of the countable parameter
      * @return EloquentBuilder
      */
-    protected function getCountableBaseQuery($parameter = null)
+    protected function getCountableBaseQuery(?string $parameter = null)
     {
         return \App\Product::query();
     }
 
-    protected function countStrategies()
+    protected function countStrategies(): array
     {
         return [
-        
+
             // For the given example call, this would return all
             // Brand id's with product counts for each; but only for
             // the subset that results from filtering by categories
             // (or any other filter parameter other than brands itself).
-            
+
             'brands' => new ParameterCounters\SimpleBelongsTo(),
         ];
-        
-        // 'categories' is not present here either, since it 
+
+        // 'categories' is not present here either, since it
         // will similarly be handled in the countParameter method.
     }
 
@@ -229,24 +229,24 @@ And add the following to it:
      * @param EloquentBuilder $query
      * @return mixed
      */
-    protected function countParameter($parameter, $query)
+    protected function countParameter(string $parameter, $query)
     {
         switch ($parameter) {
 
             case 'categories':
-                
+
                 // The query that will be executed for this is modified to include
                 // all parameters (in the example, none will be applied for categories,
                 // so it would be the same as executing it on Product:: instead of the
                 // $query parameter here.
-                
+
                 return $query->select('category_product.category_id AS id', \DB::raw('COUNT(*) AS count'))
                              ->groupBy('category_product.category_id')
                              ->join('category_product', 'category_product.product_id', '=', 'products.id')
                              ->pluck('count', 'id');
 
         }
-        
+
         return parent::countParameter($parameter, $query);
     }
 ```
