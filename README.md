@@ -18,10 +18,11 @@ This is not a ready-to-use package, but a framework you can extend for your own 
 
 ## Version Compatibility
 
- Laravel       | Package
-:--------------|:--------
- 5.8 and below | 1.1
- 6.0 and up    | 2.0
+ Laravel       | PHP     | Package
+:--------------|:--------|:--------
+ 5.8 and below | 7.0+    | 1.1
+ 6.0 to 7.0    | 7.1+    | 2.0
+ 6.0 and up    | 7.2+    | 3.0
 
 ## Changelog
 
