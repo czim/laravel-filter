@@ -13,20 +13,20 @@
     "authors": [
         {
             "name": "Coen Zimmerman",
-            "email": "coen@pxlwidgets.com",
-            "homepage": "https://www.pxlwidgets.com",
+            "email": "coen.zimmerman@endeavour.nl",
+            "homepage": "https://endeavour.nl",
             "role": "Developer"
         }
     ],
     "require": {
         "php" : "^7.2|^8.0",
-        "illuminate/support": "^6|^7|^8",
-        "illuminate/database": "^6|^7|^8",
+        "illuminate/support": "^6|^7|^8|^9",
+        "illuminate/database": "^6|^7|^8|^9",
         "myclabs/php-enum": "^1.4"
     },
     "require-dev": {
         "phpunit/phpunit" : "^8.0|^9.0",
-        "orchestra/testbench": "^4.0|^5.0|^6.0"
+        "orchestra/testbench": "^4.0|^5.0|^6.0|^7.0"
     },
     "autoload": {
         "psr-4": {
