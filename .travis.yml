@@ -1,8 +1,8 @@
 language: php
 
 php:
-  - 7.3
   - 7.4
+  - 8.0
 
 install:
     - COMPOSER_MEMORY_LIMIT=-1 travis_retry composer install --prefer-dist --no-interaction
