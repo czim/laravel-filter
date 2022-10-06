@@ -158,7 +158,7 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
             } elseif (! is_callable($strategy)) {
                 throw new ParameterStrategyInvalidException(
                     "Invalid counting strategy defined for parameter '{$parameterName}',"
-                    . " must be ParameterFilterInterface, classname, callable or null"
+                    . ' must be ParameterFilterInterface, classname, callable or null'
                 );
             }
 

@@ -27,7 +27,7 @@ class SimpleDistinctValue implements ParameterCounterInterface
     public function __construct(
         protected readonly ?string $columnName = null,
         protected readonly bool $includeEmpty = false,
-        protected readonly string $countRaw = 'COUNT(*)',
+        protected readonly string $countRaw = 'count(*)',
         protected readonly string $columnAlias = 'value',
         protected readonly string $countAlias = 'count',
     ) {
@@ -52,10 +52,11 @@ class SimpleDistinctValue implements ParameterCounterInterface
             $query->whereNotNull($columnName);
         }
 
-        return $query->select(
-                "{$columnName} AS {$this->columnAlias}",
-                DB::raw("{$this->countRaw} AS {$this->countAlias}")
-            )
+        return $query
+            ->select([
+                "{$columnName} as {$this->columnAlias}",
+                DB::raw("{$this->countRaw} as {$this->countAlias}"),
+            ])
             ->groupBy($columnName)
             ->pluck($this->countAlias, $this->columnAlias);
     }

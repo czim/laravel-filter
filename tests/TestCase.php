@@ -30,7 +30,7 @@ abstract class TestCase extends OrchestraTestCase
             'prefix'   => '',
         ]);
 
-        $app['config']->set('translatable', (new TranslatableConfig)->getConfig());
+        $app['config']->set('translatable', (new TranslatableConfig())->getConfig());
     }
 
 

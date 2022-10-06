@@ -61,10 +61,10 @@ class SimpleBelongsTo implements ParameterCounterInterface
         }
 
         return $query
-            ->select(
-                "{$columnName} AS {$this->columnAlias}",
-                DB::raw("{$this->countRaw} AS {$this->countAlias}")
-            )
+            ->select([
+                "{$columnName} as {$this->columnAlias}",
+                DB::raw("{$this->countRaw} as {$this->countAlias}")
+            ])
             ->groupBy($columnName)
             ->pluck($this->countAlias, $this->columnAlias);
     }
@@ -79,4 +79,3 @@ class SimpleBelongsTo implements ParameterCounterInterface
         return $this->columnName;
     }
 }
-

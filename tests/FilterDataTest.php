@@ -45,7 +45,7 @@ class FilterDataTest extends TestCase
             ]);
         } catch (FilterDataValidationFailedException $e) {
             $messages = $e->getMessages();
-            static::assertCount(3, $messages, "Exception getMessages should have 3 messages");
+            static::assertCount(3, $messages, 'Exception getMessages should have 3 messages');
         }
 
         $this->expectException(FilterDataValidationFailedException::class);

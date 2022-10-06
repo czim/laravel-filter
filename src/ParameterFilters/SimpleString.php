@@ -47,4 +47,3 @@ class SimpleString implements ParameterFilterInterface
         return $query->where($column, $operator, $value);
     }
 }
-

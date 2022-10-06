@@ -185,7 +185,7 @@ class Filter implements Contracts\FilterInterface
             } elseif (! is_callable($strategy) && ! is_array($strategy)) {
                 throw new ParameterStrategyInvalidException(
                     "Invalid strategy defined for parameter '{$parameterName}',"
-                    . " must be ParameterFilterInterface, classname, callable or null"
+                    . ' must be ParameterFilterInterface, classname, callable or null'
                 );
             }
 
@@ -358,7 +358,7 @@ class Filter implements Contracts\FilterInterface
      *
      * Override this to set the strategies for your filter.
      *
-     * @return array<string, ParameterFilterInterface|class-string<ParameterFilterInterface>|string|callable|null> by name
+     * @return array<string, ParameterFilterInterface|class-string<ParameterFilterInterface>|string|callable|null>
      */
     protected function strategies(): array
     {

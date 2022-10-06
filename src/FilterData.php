@@ -110,7 +110,8 @@ class FilterData implements Contracts\FilterDataInterface, Contracts\Validatable
         }
 
         if (! $this->validate()) {
-            throw (new FilterDataValidationFailedException)->setMessages($this->messages());
+            throw (new FilterDataValidationFailedException())
+                ->setMessages($this->messages());
         }
     }
 

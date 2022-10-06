@@ -23,12 +23,12 @@ class TestRelatedModel extends Model
         'active',
     ];
 
-    public function TestSimpleModel(): BelongsTo
+    public function testSimpleModel(): BelongsTo
     {
         return $this->belongsTo(TestSimpleModel::class);
     }
 
-    public function TestSimpleModels(): HasMany
+    public function testSimpleModels(): HasMany
     {
         return $this->hasMany(TestSimpleModel::class);
     }

@@ -30,7 +30,7 @@ class TestFilter extends Filter
 
             'parameter_filter_instance' => new SimpleString('test_simple_models', 'name', true),
             'parameter_filter_string'   => TestParameterFilterByString::class,
-            'closure_strategy'          => function($name, $value, $query) { $this->closureTestMethod($name, $value, $query); },
+            'closure_strategy'          => fn ($name, $value, $query) => $this->closureTestMethod($name, $value, $query),
             'closure_strategy_array'    => [ $this, 'closureTestMethod' ],
 
             'global_setting'            => Filter::SETTING,

@@ -121,7 +121,7 @@ class FilterTest extends TestCase
         static::assertEquals(
             'first name filter',
             $filter->getFilterData()->toArray()['name'],
-            "Incorrect name for first set of filterdata"
+            'Incorrect name for first set of filterdata'
         );
 
         $filterData = new TestFilterData([
@@ -136,7 +136,7 @@ class FilterTest extends TestCase
         static::assertEquals(
             'some name',
             $filter->getFilterData()->toArray()['name'],
-            "Filter data did not change after setFilterData()"
+            'Filter data did not change after setFilterData()'
         );
     }
 
@@ -147,18 +147,18 @@ class FilterTest extends TestCase
     {
         $filter = new TestFilter(['name' => 'first name filter']);
 
-        static::assertEmpty($filter->setting('does_not_exist'), "Setting that was never set should be empty");
+        static::assertEmpty($filter->setting('does_not_exist'), 'Setting that was never set should be empty');
 
         $filter->setSetting('some_setting', 'some value');
 
         static::assertEquals(
             'some value',
             $filter->setting('some_setting'),
-            "Setting that was set did not have correct value"
+            'Setting that was set did not have correct value'
         );
 
         // Returns null if never defined.
-        static::assertNull($filter->setting('never_defined_this_key_at_all'), "Undefined settings should return null");
+        static::assertNull($filter->setting('never_defined_this_key_at_all'), 'Undefined settings should return null');
     }
 
     /**
@@ -175,7 +175,7 @@ class FilterTest extends TestCase
         static::assertEquals(
             'SWEET SETTING VALUE',
             $filter->setting('global_setting'),
-            "Setting that was set as filter parameter strategy did not have correct value"
+            'Setting that was set as filter parameter strategy did not have correct value'
         );
     }
 
@@ -250,12 +250,12 @@ class FilterTest extends TestCase
         static::assertCount(
             1,
             $result,
-            "Count for single filter parameter (loosy string, strategy parameterfilter) incorrect"
+            'Count for single filter parameter (loosy string, strategy parameterfilter) incorrect'
         );
         static::assertEquals(
             '1337',
             $result->first()->{self::UNIQUE_FIELD},
-            "Result incorrect for single filter parameter"
+            'Result incorrect for single filter parameter'
         );
 
         // Double filter, with relation ID parameter filter.
@@ -268,7 +268,7 @@ class FilterTest extends TestCase
         static::assertCount(
             2,
             $result,
-            "Count for multiple filter parameters (loosy string and relation ids, and inactive) incorrect"
+            'Count for multiple filter parameters (loosy string and relation ids, and inactive) incorrect'
         );
     }
 
@@ -283,12 +283,12 @@ class FilterTest extends TestCase
         static::assertCount(
             1,
             $result,
-            "Count for single filter parameter incorrect (exact string, strategy parameterfilter)"
+            'Count for single filter parameter incorrect (exact string, strategy parameterfilter)'
         );
         static::assertEquals(
             '1337',
             $result->first()->{self::UNIQUE_FIELD},
-            "Result incorrect for single filter parameter (exact string, strategy parameterfilter)"
+            'Result incorrect for single filter parameter (exact string, strategy parameterfilter)'
         );
     }
 
@@ -303,12 +303,12 @@ class FilterTest extends TestCase
         static::assertCount(
             1,
             $result,
-            "Count for single filter parameter incorrect (strategy parameterfilter by string)"
+            'Count for single filter parameter incorrect (strategy parameterfilter by string)'
         );
         static::assertEquals(
             '1337',
             $result->first()->{self::UNIQUE_FIELD},
-            "Result incorrect for single filter parameter (strategy parameterfilter by string)"
+            'Result incorrect for single filter parameter (strategy parameterfilter by string)'
         );
     }
 
@@ -324,12 +324,12 @@ class FilterTest extends TestCase
         static::assertCount(
             1,
             $result,
-            "Count for single filter parameter incorrect (strategy closure with parameters)"
+            'Count for single filter parameter incorrect (strategy closure with parameters)'
         );
         static::assertEquals(
             '1337',
             $result->first()->{self::UNIQUE_FIELD},
-            "Result incorrect for single filter parameter (strategy closure with parameters)"
+            'Result incorrect for single filter parameter (strategy closure with parameters)'
         );
 
         // Closure as [ object, method ] array.
@@ -339,12 +339,12 @@ class FilterTest extends TestCase
         static::assertCount(
             1,
             $result,
-            "Count for single filter parameter incorrect (strategy closure with parameters, array syntax)"
+            'Count for single filter parameter incorrect (strategy closure with parameters, array syntax)'
         );
         static::assertEquals(
             '1337',
             $result->first()->{self::UNIQUE_FIELD},
-            "Result incorrect for single filter parameter (strategy closure with parameters, array syntax)"
+            'Result incorrect for single filter parameter (strategy closure with parameters, array syntax)'
         );
     }
 
@@ -366,14 +366,14 @@ class FilterTest extends TestCase
         static::assertMatchesRegularExpression(
             '#adding_joins#i',
             $query,
-            "Query SQL did not have parameter check in where clause"
+            'Query SQL did not have parameter check in where clause'
         );
 
         static::assertMatchesRegularExpression(
             '#(inner )?join [`"]test_related_models[`"] on [`"]test_related_models[`"].[`"]id[`"] '
             . '= [`"]test_simple_models[`"].[`"]test_related_model_id[`"]#i',
             $query,
-            "Query SQL does not feature expected join clause"
+            'Query SQL does not feature expected join clause'
         );
 
 
@@ -386,20 +386,20 @@ class FilterTest extends TestCase
         static::assertMatchesRegularExpression(
             '#no_duplicate_joins#i',
             $query,
-            "Query SQL did not have parameter check in where clause (second param)"
+            'Query SQL did not have parameter check in where clause (second param)'
         );
 
         static::assertMatchesRegularExpression(
             '#(inner )?join [`"]test_related_models[`"] on [`"]test_related_models[`"].[`"]id[`"] '
             . '= [`"]test_simple_models[`"].[`"]test_related_model_id[`"]#i',
             $query,
-            "Query SQL does not feature expected join clause (with second param)"
+            'Query SQL does not feature expected join clause (with second param)'
         );
 
         static::assertEquals(
             1,
             substr_count(strtolower($query), ' join '),
-            "Query SQL should have only one join clause"
+            'Query SQL should have only one join clause'
         );
     }
 }

@@ -107,7 +107,7 @@ class CountableFilterTest extends TestCase
         static::assertCount(
             2,
             $filter->getCountables(),
-            "Wrong count for getCountables()"
+            'Wrong count for getCountables()'
         );
     }
 
@@ -125,20 +125,20 @@ class CountableFilterTest extends TestCase
 
         $counts = $filter->getCounts();
 
-        static::assertCount(2, $counts, "getCounts() results should have 2 items");
+        static::assertCount(2, $counts, 'getCounts() results should have 2 items');
 
         // Position 14 appears twice, 0 and 1 once.
         static::assertEquals(
             [0 => 1, 1 => 1, 14 => 2],
             $counts->get('position')->toArray(),
-            "getCounts() first (distinct value) results incorrect"
+            'getCounts() first (distinct value) results incorrect'
         );
 
         // Related model id 1 appears twice, the rest once.
         static::assertEquals(
             [1 => 2, 2 => 1, 3 => 1],
             $counts->get('relateds')->toArray(),
-            "getCounts() first (belongsto) results incorrect"
+            'getCounts() first (belongsto) results incorrect'
         );
     }
 
@@ -158,13 +158,13 @@ class CountableFilterTest extends TestCase
 
         $counts = $filter->getCounts();
 
-        static::assertCount(1, $counts, "getCounts() results should have 1 item (the other is ignored)");
+        static::assertCount(1, $counts, 'getCounts() results should have 1 item (the other is ignored)');
 
         // Position 14 appears twice, 0 and 1 once.
         static::assertEquals(
             [0 => 1, 1 => 1, 14 => 2],
             $counts->get('position')->toArray(),
-            "getCounts() result should be correct position only"
+            'getCounts() result should be correct position only'
         );
 
 
@@ -173,7 +173,7 @@ class CountableFilterTest extends TestCase
 
         $counts = $filter->getCounts();
 
-        static::assertCount(2, $counts, "getCounts() results should have 2 items after unignoring countable");
+        static::assertCount(2, $counts, 'getCounts() results should have 2 items after unignoring countable');
     }
 
     /**
@@ -185,13 +185,13 @@ class CountableFilterTest extends TestCase
 
         $counts = $filter->getCounts(['position']);
 
-        static::assertCount(1, $counts, "getCounts() results should have 1 item (the other is ignored)");
+        static::assertCount(1, $counts, 'getCounts() results should have 1 item (the other is ignored)');
 
         // Position 14 appears twice, 0 and 1 once.
         static::assertEquals(
             [0 => 1, 1 => 1, 14 => 2],
             $counts->get('position')->toArray(),
-            "getCounts() result should be correct position only"
+            'getCounts() result should be correct position only'
         );
     }
 }
