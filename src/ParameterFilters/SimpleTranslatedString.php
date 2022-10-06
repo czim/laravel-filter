@@ -17,8 +17,8 @@ use Illuminate\Support\Str;
  * the translationTable parameter.
  *
  * Standard Laravel conventions are required for this to work, so the
- * translated table somethings.id should be referred to in the foreign key
- * on the translations table as something_translations.something_id
+ * translated table `<something>`.`id` should be referred to in the foreign key
+ * on the translations table as something_translations.something_id.
  */
 class SimpleTranslatedString implements ParameterFilterInterface
 {
@@ -55,7 +55,7 @@ class SimpleTranslatedString implements ParameterFilterInterface
      * @param string|null $translationTable
      * @param string|null $column           if given, overrules the attribute name
      * @param string|null $locale
-     * @param bool        $exact            whether this should not be a loosy comparison
+     * @param bool        $exact            whether this should not be a loosy (like) comparison
      */
     public function __construct(
         string $table,

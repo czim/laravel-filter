@@ -49,7 +49,7 @@ class SimpleInteger implements ParameterFilterInterface
             . (! empty($this->column) ? $this->column : $name);
 
 
-        // an array of values: do a whereIn query
+        // If the value is a list, do a whereIn query:
         if ($value instanceof Arrayable) {
             $value = $value->toArray();
         }
@@ -59,6 +59,7 @@ class SimpleInteger implements ParameterFilterInterface
             return $query;
         }
 
+        // Otherwise, do a normal comparison.
         return $query->where($column, $this->operator, $value);
     }
 }

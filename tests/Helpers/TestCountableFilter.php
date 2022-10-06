@@ -9,8 +9,6 @@ use Czim\Filter\Test\Helpers\Models\TestSimpleModel;
 
 class TestCountableFilter extends CountableFilter
 {
-    // Filter methods / configuration
-
     /**
      * @var string
      */
@@ -25,7 +23,7 @@ class TestCountableFilter extends CountableFilter
     ];
 
     /**
-     * @return array<string, mixed>
+     * {@inheritDoc}
      */
     protected function strategies(): array
     {
@@ -44,7 +42,7 @@ class TestCountableFilter extends CountableFilter
     protected function applyParameter(string $name, $value, $query)
     {
         // Typical with inactive lookup.
-        // Make sure we don't get the the 'no fallback strategy' exception.
+        // Make sure we don't get the 'no fallback strategy' exception.
         if ($name === 'with_inactive') {
             if (! $value) {
                 $query->where('active', true);
@@ -56,15 +54,13 @@ class TestCountableFilter extends CountableFilter
         parent::applyParameter($name, $value, $query);
     }
 
-    // CountableFilter methods / configuration
-
     protected function getCountableBaseQuery(?string $parameter = null)
     {
         return TestSimpleModel::query();
     }
 
     /**
-     * @return array<string, mixed>
+     * {@inheritDoc}
      */
     protected function countStrategies(): array
     {

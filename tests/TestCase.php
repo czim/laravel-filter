@@ -4,10 +4,10 @@ namespace Czim\Filter\Test;
 
 use Czim\Filter\Test\Helpers\TranslatableConfig;
 use Illuminate\Database\DatabaseManager;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
-abstract class TestCase extends \Orchestra\Testbench\TestCase
+abstract class TestCase extends OrchestraTestCase
 {
     protected const TABLE_NAME_SIMPLE       = 'test_simple_models';
     protected const TABLE_NAME_TRANSLATIONS = 'test_simple_model_translations';
@@ -19,7 +19,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     protected $db;
 
     /**
-     * @param Application $app
+     * {@inheritDoc}
      */
     protected function getEnvironmentSetUp($app): void
     {
@@ -30,9 +30,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             'database' => ':memory:',
             'prefix'   => '',
         ]);
-
-        // set minutes for cache to live
-        //$app['config']->set('cache.ttl', 60);
 
         $app['config']->set('translatable', (new TranslatableConfig)->getConfig());
     }

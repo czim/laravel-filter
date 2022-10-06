@@ -54,7 +54,7 @@ class SimpleString implements ParameterFilterInterface
         $operator = '=';
 
         if (! $this->exact) {
-            $operator = 'LIKE';
+            $operator = 'like';
             $value    = '%' . $value . '%';
         }
 

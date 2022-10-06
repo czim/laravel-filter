@@ -7,7 +7,7 @@ use Czim\Filter\FilterData;
 class TestFilterData extends FilterData
 {
     /**
-     * @var array<string string>
+     * {@inheritDoc}
      */
     protected $rules = [
         'name'                   => 'string',
@@ -22,7 +22,7 @@ class TestFilterData extends FilterData
     ];
 
     /**
-     * @var array<string, mixed>
+     * {@inheritDoc}
      */
     protected $defaults = [
         'name'          => null,
@@ -30,7 +30,7 @@ class TestFilterData extends FilterData
         'position'      => null,
         'with_inactive' => false,
 
-        // for tests of the strategy interpretation
+        // For tests of the strategy interpretation.
         'no_strategy_set'             => null,
         'no_strategy_set_no_fallback' => null,
         'parameter_filter_instance'   => null,
@@ -40,7 +40,7 @@ class TestFilterData extends FilterData
 
         'global_setting'              => null,
 
-        // testing exceptions for invalid strategies
+        // Testing exceptions for invalid strategies.
         'invalid_strategy_string'     => null,
         'invalid_strategy_general'    => null,
         'invalid_strategy_interface'  => null,

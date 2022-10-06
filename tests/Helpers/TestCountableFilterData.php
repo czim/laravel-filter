@@ -7,7 +7,7 @@ use Czim\Filter\FilterData;
 class TestCountableFilterData extends FilterData
 {
     /**
-     * @var array<string, string>
+     * {@inheritDoc}
      */
     protected $rules = [
         'name'                   => 'string',
@@ -17,7 +17,7 @@ class TestCountableFilterData extends FilterData
     ];
 
     /**
-     * @var array<string, mixed>
+     * {@inheritDoc}
      */
     protected $defaults = [
         'name'          => null,

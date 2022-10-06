@@ -78,7 +78,7 @@ class FilterTest extends TestCase
             FilterInterface::class,
             new TestFilter([
                 'name'          => 'some name',
-                'relateds'      => [ 1, 2, 3 ],
+                'relateds'      => [1, 2, 3],
                 'position'      => 20,
                 'with_inactive' => false,
             ])
@@ -92,7 +92,7 @@ class FilterTest extends TestCase
     {
         $filterData = new TestFilterData([
             'name'          => 'some name',
-            'relateds'      => [ 1, 2, 3 ],
+            'relateds'      => [1, 2, 3],
             'position'      => 20,
             'with_inactive' => false,
         ]);
@@ -114,7 +114,7 @@ class FilterTest extends TestCase
      */
     public function it_can_get_and_set_filter_data_objects(): void
     {
-        $filter = new TestFilter([ 'name' => 'first name filter' ]);
+        $filter = new TestFilter(['name' => 'first name filter']);
 
         static::assertEquals(
             'first name filter',
@@ -124,7 +124,7 @@ class FilterTest extends TestCase
 
         $filterData = new TestFilterData([
             'name'          => 'some name',
-            'relateds'      => [ 1, 2, 3 ],
+            'relateds'      => [1, 2, 3],
             'position'      => 20,
             'with_inactive' => false,
         ]);
@@ -143,7 +143,7 @@ class FilterTest extends TestCase
      */
     public function it_can_get_and_set_global_settings(): void
     {
-        $filter = new TestFilter([ 'name' => 'first name filter' ]);
+        $filter = new TestFilter(['name' => 'first name filter']);
 
         static::assertEmpty($filter->setting('does_not_exist'), "Setting that was never set should be empty");
 
@@ -155,7 +155,7 @@ class FilterTest extends TestCase
             "Setting that was set did not have correct value"
         );
 
-        // returns null if never defined
+        // Returns null if never defined.
         static::assertNull($filter->setting('never_defined_this_key_at_all'), "Undefined settings should return null");
     }
 
@@ -164,10 +164,10 @@ class FilterTest extends TestCase
      */
     public function it_can_set_global_settings_by_way_of_filter_parameter_strategy(): void
     {
-        $filter = new TestFilter([ 'global_setting' => 'SWEET SETTING VALUE' ]);
+        $filter = new TestFilter(['global_setting' => 'SWEET SETTING VALUE']);
 
-        // only happens when it applies the setting!
-        // this should especially NOT throw the exception for 'no fallback'.
+        // Only happens when it applies the setting!
+        // This should especially NOT throw the exception for 'no fallback'.
         $filter->apply(TestSimpleModel::query());
 
         static::assertEquals(
@@ -188,7 +188,7 @@ class FilterTest extends TestCase
     {
         $this->expectException(FilterParameterUnhandledException::class);
 
-        (new TestFilter([ 'no_strategy_set_no_fallback' => 'something to activate it' ]))
+        (new TestFilter(['no_strategy_set_no_fallback' => 'something to activate it']))
             ->apply(TestSimpleModel::query());
     }
 
@@ -200,7 +200,7 @@ class FilterTest extends TestCase
         $this->expectException(ParameterStrategyInvalidException::class);
         $this->expectExceptionMessageMatches('#uninstantiable_string_that_is_not_a_parameter_filter#i');
 
-        (new TestFilter([ 'invalid_strategy_string' => 'ignored' ]))
+        (new TestFilter(['invalid_strategy_string' => 'ignored']))
             ->apply(TestSimpleModel::query());
     }
 
@@ -211,7 +211,7 @@ class FilterTest extends TestCase
     {
         $this->expectException(ParameterStrategyInvalidException::class);
 
-        (new TestFilter([ 'invalid_strategy_general' => 'ignored' ]))
+        (new TestFilter(['invalid_strategy_general' => 'ignored']))
             ->apply(TestSimpleModel::query());
     }
 
@@ -223,7 +223,7 @@ class FilterTest extends TestCase
         $this->expectException(ParameterStrategyInvalidException::class);
         $this->expectExceptionMessageMatches('#is not a?\s*ParameterFilter#i');
 
-        (new TestFilter([ 'invalid_strategy_interface' => 'ignored' ]))
+        (new TestFilter(['invalid_strategy_interface' => 'ignored']))
             ->apply(TestSimpleModel::query());
     }
 
@@ -237,13 +237,13 @@ class FilterTest extends TestCase
      */
     public function it_applies_parameters_to_a_query(): void
     {
-        // uses the defaults even if no parameters set
+        // Uses the defaults even if no parameters set.
         $result = (new TestFilter([]))->apply(TestSimpleModel::query())->get();
 
         static::assertCount(2, $result, "Count for no parameters set result incorrect (should be 2 with 'active' = 1)");
 
         // simple single filter
-        $result = (new TestFilter([ 'name' => 'special' ]))->apply(TestSimpleModel::query())->get();
+        $result = (new TestFilter(['name' => 'special']))->apply(TestSimpleModel::query())->get();
 
         static::assertCount(
             1,
@@ -256,7 +256,7 @@ class FilterTest extends TestCase
             "Result incorrect for single filter parameter"
         );
 
-        // double filter, with relation id parameterfilter
+        // Double filter, with relation ID parameter filter.
         $result = (new TestFilter([
             'name'          => 'name',
             'relateds'      => [1, 2],
@@ -275,8 +275,8 @@ class FilterTest extends TestCase
      */
     public function it_applies_parameters_by_strategy_of_instantiated_parameter_filter(): void
     {
-        $result = (new TestFilter([ 'parameter_filter_instance' => 'special name' ]))
-                    ->apply(TestSimpleModel::query())->get();
+        $result = (new TestFilter(['parameter_filter_instance' => 'special name']))
+            ->apply(TestSimpleModel::query())->get();
 
         static::assertCount(
             1,
@@ -295,8 +295,8 @@ class FilterTest extends TestCase
      */
     public function it_applies_parameters_by_strategy_of_instantiable_parameter_filter_class_string(): void
     {
-        $result = (new TestFilter([ 'parameter_filter_string' => 'ignored, hardcoded test filter' ]))
-                    ->apply(TestSimpleModel::query())->get();
+        $result = (new TestFilter(['parameter_filter_string' => 'ignored, hardcoded test filter']))
+            ->apply(TestSimpleModel::query())->get();
 
         static::assertCount(
             1,
@@ -315,9 +315,9 @@ class FilterTest extends TestCase
      */
     public function it_applies_parameters_by_strategy_of_closure(): void
     {
-        // closure as anonymous function
-        $result = (new TestFilter([ 'closure_strategy' => [ 'special name', 3 ] ]))
-                    ->apply(TestSimpleModel::query())->get();
+        // Closure as anonymous function.
+        $result = (new TestFilter(['closure_strategy' => ['special name', 3]]))
+            ->apply(TestSimpleModel::query())->get();
 
         static::assertCount(
             1,
@@ -330,9 +330,9 @@ class FilterTest extends TestCase
             "Result incorrect for single filter parameter (strategy closure with parameters)"
         );
 
-        // closure as [ object, method ] array
-        $result = (new TestFilter([ 'closure_strategy_array' => [ 'special name', 3 ] ]))
-                    ->apply(TestSimpleModel::query())->get();
+        // Closure as [ object, method ] array.
+        $result = (new TestFilter(['closure_strategy_array' => ['special name', 3]]))
+            ->apply(TestSimpleModel::query())->get();
 
         static::assertCount(
             1,
@@ -356,7 +356,7 @@ class FilterTest extends TestCase
      */
     public function it_adds_joins_and_applies_them_after_all_filters(): void
     {
-        // add joins using addJoin method
+        // Add joins using addJoin method.
         $query = (new TestFilter([
             'adding_joins' => 'okay',
         ]))->apply(TestSimpleModel::query())->toSql();
@@ -369,13 +369,13 @@ class FilterTest extends TestCase
 
         static::assertMatchesRegularExpression(
             '#(inner )?join [`"]test_related_models[`"] on [`"]test_related_models[`"].[`"]id[`"] '
-                . '= [`"]test_simple_models[`"].[`"]test_related_model_id[`"]#i',
+            . '= [`"]test_simple_models[`"].[`"]test_related_model_id[`"]#i',
             $query,
             "Query SQL does not feature expected join clause"
         );
 
 
-        // check if joins are not duplicated
+        // Check if joins are not duplicated.
         $query = (new TestFilter([
             'adding_joins'       => 'okay',
             'no_duplicate_joins' => 'please',
@@ -389,7 +389,7 @@ class FilterTest extends TestCase
 
         static::assertMatchesRegularExpression(
             '#(inner )?join [`"]test_related_models[`"] on [`"]test_related_models[`"].[`"]id[`"] '
-                . '= [`"]test_simple_models[`"].[`"]test_related_model_id[`"]#i',
+            . '= [`"]test_simple_models[`"].[`"]test_related_model_id[`"]#i',
             $query,
             "Query SQL does not feature expected join clause (with second param)"
         );

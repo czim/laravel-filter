@@ -90,7 +90,7 @@ class CountableFilterTest extends TestCase
 
         static::assertInstanceOf(
             CountableFilterInterface::class,
-            new TestCountableFilter([ 'name' => 'test' ])
+            new TestCountableFilter(['name' => 'test'])
         );
     }
 
@@ -125,16 +125,16 @@ class CountableFilterTest extends TestCase
 
         static::assertCount(2, $counts, "getCounts() results should have 2 items");
 
-        // position 14 appears twice, 0 and 1 once
+        // Position 14 appears twice, 0 and 1 once.
         static::assertEquals(
-            [ 0 => 1,  1 => 1, 14 => 2 ],
+            [0 => 1, 1 => 1, 14 => 2],
             $counts->get('position')->toArray(),
             "getCounts() first (distinct value) results incorrect"
         );
 
-        // related model id 1 appears twice, the rest once
+        // Related model id 1 appears twice, the rest once.
         static::assertEquals(
-            [ 1 => 2,  2 => 1, 3 => 1 ],
+            [1 => 2, 2 => 1, 3 => 1],
             $counts->get('relateds')->toArray(),
             "getCounts() first (belongsto) results incorrect"
         );
@@ -158,15 +158,15 @@ class CountableFilterTest extends TestCase
 
         static::assertCount(1, $counts, "getCounts() results should have 1 item (the other is ignored)");
 
-        // position 14 appears twice, 0 and 1 once
+        // Position 14 appears twice, 0 and 1 once.
         static::assertEquals(
-            [ 0 => 1,  1 => 1, 14 => 2 ],
+            [0 => 1, 1 => 1, 14 => 2],
             $counts->get('position')->toArray(),
             "getCounts() result should be correct position only"
         );
 
 
-        // after unignoring, all countables should be there
+        // After unignoring, all countables should be there.
         $filter->unignoreCountable('relateds');
 
         $counts = $filter->getCounts();
@@ -181,13 +181,13 @@ class CountableFilterTest extends TestCase
     {
         $filter = new TestCountableFilter([]);
 
-        $counts = $filter->getCounts([ 'position' ]);
+        $counts = $filter->getCounts(['position']);
 
         static::assertCount(1, $counts, "getCounts() results should have 1 item (the other is ignored)");
 
-        // position 14 appears twice, 0 and 1 once
+        // Position 14 appears twice, 0 and 1 once.
         static::assertEquals(
-            [ 0 => 1,  1 => 1, 14 => 2 ],
+            [0 => 1, 1 => 1, 14 => 2],
             $counts->get('position')->toArray(),
             "getCounts() result should be correct position only"
         );

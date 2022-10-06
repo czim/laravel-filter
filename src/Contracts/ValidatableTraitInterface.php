@@ -8,11 +8,6 @@ interface ValidatableTraitInterface
 {
     public function validate(): bool;
 
-    /**
-     * If validation tried and failed, returns validation messages.
-     *
-     * @return MessageBag
-     */
     public function messages(): MessageBag;
 
     /**
@@ -24,5 +19,4 @@ interface ValidatableTraitInterface
      * @param array<string, mixed> $rules
      */
     public function setRules(array $rules): void;
-
 }

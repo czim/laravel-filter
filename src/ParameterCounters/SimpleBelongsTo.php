@@ -15,7 +15,7 @@ use Illuminate\Support\Str;
  * If no parameters are given on construction, it will assume an id field with the Laravel
  * naming convention, for a table-name parameter name:
  *
- * Ex:
+ * Example:
  *      parameter name: 'brands'
  *      result: counts 'brand_id'
  */
@@ -68,7 +68,7 @@ class SimpleBelongsTo implements ParameterCounterInterface
     }
 
     /**
-     * Returns the count for a countable parameter, given the query provided
+     * Returns the count for a countable parameter, given the query provided.
      *
      * @param string                   $name
      * @param EloquentBuilder          $query

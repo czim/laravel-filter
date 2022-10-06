@@ -32,10 +32,11 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
 
     /**
      * Application strategies for all countables to get counts for.
+     *
      * Just like the strategies property, but now for getCount()
      *
      * These can be either:
-     *      an instance of ParameterCounterFilter,
+     *      an instance of ParameterCounterInterface,
      *      a string classname of an instantiatable ParameterCounterFilter,
      *      a callback that follows the same logic as ParameterCounterFilter->count()
      *      null, which means that getCountForParameter() will be called on the Filter
@@ -75,8 +76,6 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
 
 
     /**
-     * Constructs the relevant FilterData if one is not injected.
-     *
      * @param array|Arrayable|FilterDataInterface $data
      */
     public function __construct($data)
@@ -87,7 +86,8 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
     }
 
     /**
-     * Initializes strategies for counting countables
+     * Initializes strategies for counting countables.
+     *
      * Override this to set the countable strategies for your filter.
      *
      * @return array<string, mixed>
@@ -120,7 +120,7 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
     /**
      * Gets alternative counts per (relevant) attribute for the filter data.
      *
-     * @param string[] $countables  overrides ignoredCountables
+     * @param string[] $countables overrides ignoredCountables
      * @return CountableResults
      * @throws ParameterStrategyInvalidException
      */
@@ -130,7 +130,7 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
 
         $strategies = $this->buildCountableStrategies();
 
-        // Determine which countables to count for
+        // Determine which countables to count for.
         if (! empty($countables)) {
             $countables = array_intersect($this->getCountables(), $countables);
         } else {
@@ -138,7 +138,7 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
         }
 
         foreach ($countables as $parameterName) {
-            // should we skip it no matter what?
+            // Should we skip it no matter what?
             if ($this->isCountableIgnored($parameterName)) {
                 continue;
             }
@@ -162,10 +162,10 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
                 );
             }
 
-            // start with a fresh query.
+            // Start with a fresh query.
             $query = $this->getCountableBaseQuery();
 
-            // apply the filter while temporarily ignoring the current countable parameter,
+            // Apply the filter while temporarily ignoring the current countable parameter,
             // unless it is forced to be included.
             $includeSelf = in_array($parameterName, $this->includeSelfInCount);
 
@@ -179,7 +179,7 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
                 $this->unignoreParameter($parameterName);
             }
 
-            // retrieve the count and put it in the results
+            // Retrieve the count and put it in the results.
             $counts->put($parameterName, $strategy($parameterName, $query, $this));
         }
 
@@ -199,14 +199,14 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
      */
     protected function countParameter(string $parameter, $query)
     {
-        // Default is to always warn that we don't have a strategy
+        // Default is to always warn that we don't have a strategy.
         throw new FilterParameterUnhandledException(
             "No fallback strategy determined for for countable parameter '{$parameter}'"
         );
     }
 
     /**
-     * Builds up the strategies so that all instantiatable strategies are instantiated
+     * Builds up the strategies so that all instantiatable strategies are instantiated.
      *
      * @return array<string, mixed>
      * @throws ParameterStrategyInvalidException

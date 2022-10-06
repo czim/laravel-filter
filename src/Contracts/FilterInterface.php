@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 interface FilterInterface
 {
     public function setFilterData(FilterDataInterface $data): void;
-
     public function getFilterData(): FilterDataInterface;
 
     /**

@@ -10,12 +10,12 @@ use RuntimeException;
 class TestFilter extends Filter
 {
     /**
-     * @var string
+     * {@inheritDoc}
      */
     protected $filterDataClass = TestFilterData::class;
 
     /**
-     * @return array<string, mixed>
+     * {@inheritDoc}
      */
     protected function strategies(): array
     {
@@ -43,8 +43,8 @@ class TestFilter extends Filter
      */
     protected function applyParameter(string $name, $value, $query)
     {
-        // typical with inactive lookup
-        // make sure we don't get the the 'no fallback strategy' exception
+        // Typical with inactive lookup.
+        // Make sure we don't get the 'no fallback strategy' exception.
         if ($name === 'with_inactive') {
             if (! $value) {
                 $query->where('active', true);
@@ -52,7 +52,7 @@ class TestFilter extends Filter
             return;
         }
 
-        // testing joins addition
+        // Testing joins addition:
         switch ($name) {
             case 'adding_joins':
             case 'no_duplicate_joins':
@@ -69,7 +69,8 @@ class TestFilter extends Filter
     }
 
     /**
-     * Simple method to test whether closure stratgies work.
+     * Simple method to test whether closure strategies work.
+     *
      * Note that this cannot be a private method, or the [] syntax won't work.
      *
      * @param string $name
@@ -83,7 +84,8 @@ class TestFilter extends Filter
             throw new RuntimeException("Value for '{$name}' not correctly passed through closure!");
         }
 
-        return $query->where('name', '=', $value[0])
+        return $query
+            ->where('name', '=', $value[0])
             ->where('test_related_model_id', '=', $value[1]);
     }
 }

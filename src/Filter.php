@@ -22,7 +22,8 @@ class Filter implements Contracts\FilterInterface
     protected const JOIN_METHOD_RIGHT = 'rightJoin';
 
     /**
-     * The classname for the FilterData that should be constructed.
+     * The classname for the FilterData that should be constructed when the filter is
+     * constructed with plain array data.
      *
      * @var string
      */
@@ -50,17 +51,15 @@ class Filter implements Contracts\FilterInterface
     protected $data;
 
     /**
-     * Settings for the filter, filled automatically for
-     * parameters that have the Filter::SETTING strategy flag set
+     * Settings for the filter, filled automatically for parameters that have the Filter::SETTING strategy flag set.
      *
      * @var array<string, mixed>
      */
     protected $settings = [];
 
     /**
-     * Join memory: set join parameters for query->join() calls
-     * here, so they may be applied once and without unnecessary or
-     * problematic duplication
+     * Join memory: set join parameters for query->join() calls here, so they may be applied once and
+     * without unnecessary or problematic duplication.
      *
      * @var array<string, mixed>
      */
@@ -68,7 +67,7 @@ class Filter implements Contracts\FilterInterface
 
     /**
      * Join memory for type of join, defaults to left.
-     * Must be keyed by join identifier key
+     * Must be keyed by join identifier key.
      *
      * @var array<string, string>
      */
@@ -84,8 +83,6 @@ class Filter implements Contracts\FilterInterface
     protected $ignoreParameters = [];
 
     /**
-     * Constructs the relevant FilterData if one is not injected
-     *
      * @param array|Arrayable|FilterDataInterface $data
      */
     public function __construct($data)
@@ -152,7 +149,7 @@ class Filter implements Contracts\FilterInterface
     }
 
     /**
-     * Applies the loaded FilterData to a query (builder)
+     * Applies the loaded FilterData to a query (builder).
      *
      * @param Model|EloquentBuilder $query
      * @return EloquentBuilder
@@ -168,7 +165,7 @@ class Filter implements Contracts\FilterInterface
     }
 
     /**
-     * Applies all filter parameters to the query, using the configured strategies
+     * Applies all filter parameters to the query, using the configured strategies.
      *
      * @param Model|EloquentBuilder $query
      * @throws ParameterStrategyInvalidException
@@ -180,13 +177,12 @@ class Filter implements Contracts\FilterInterface
         $strategies = $this->buildStrategies();
 
         foreach ($this->data->getApplicableAttributes() as $parameterName) {
-            // Should we skip it no matter what?
             if ($this->isParameterIgnored($parameterName)) {
                 continue;
             }
 
-            // Get the value for the filter parameter
-            // and if it is empty, we're not filtering by it and should skip it.
+            // Get the value for the filter parameter and if it is empty,
+            // we're not filtering by it and should skip it.
             $parameterValue = $this->data->getParameterValue($parameterName);
 
             if ($this->isParameterValueUnset($parameterName, $parameterValue)) {
@@ -234,8 +230,8 @@ class Filter implements Contracts\FilterInterface
                 continue;
             }
 
-            // get the value for the filter parameter
-            // and if it is empty, we're not filtering by it and should skip it
+            // Get the value for the filter parameter and if it is empty,
+            // we're not filtering by it and should skip it.
             $parameterValue = $this->parameterValue($parameterName);
 
             if ($this->isParameterValueUnset($parameterName, $parameterValue)) {
@@ -276,12 +272,11 @@ class Filter implements Contracts\FilterInterface
     }
 
     /**
-     * Interprets parameters with the SETTING string and stores their
-     * current values in the settings property. This must be done before
-     * the parameters are applied, if the settings are to have any effect
+     * Interprets parameters with the SETTING string and stores their current values in the settings property.
      *
-     * Note that you must add your own interpretation & effect for settings
-     * in your FilterParameter methods/classes (use the setting() getter)
+     * This must be done before the parameters are applied, if the settings are to have any effect.
+     * Note that you must add your own interpretation & effect for settings in your FilterParameter
+     * methods/classes (use the setting() getter).
      */
     protected function storeGlobalSettings(): void
     {
@@ -298,7 +293,7 @@ class Filter implements Contracts\FilterInterface
      * Applies filter to the query for an attribute/parameter with the given parameter value,
      * this is the fall-back for when no other strategy is configured in $this->strategies.
      *
-     * Override this if you need to use it in a specific Filter instance
+     * Override this if you need to use it in a specific Filter instance.
      *
      * @param string          $parameterName
      * @param mixed|null      $parameterValue
@@ -313,16 +308,13 @@ class Filter implements Contracts\FilterInterface
         );
     }
 
-    /**
-     * Clears the joins memory.
-     */
     protected function forgetJoins(): void
     {
         $this->joins = [];
     }
 
     /**
-     * Adds a query join to be added after all parameters are applied
+     * Adds a query join to be added after all parameters are applied.
      *
      * @param string      $key        identifying key, used to prevent duplicates
      * @param mixed[]     $parameters

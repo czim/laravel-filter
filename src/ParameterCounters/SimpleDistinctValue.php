@@ -60,7 +60,7 @@ class SimpleDistinctValue implements ParameterCounterInterface
     }
 
     /**
-     * Returns the count for a countable parameter, given the query provided
+     * Returns the count for a countable parameter, given the query provided.
      *
      * @param string                   $name
      * @param EloquentBuilder          $query

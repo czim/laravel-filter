@@ -20,7 +20,7 @@ class ParameterFiltersTest extends TestCase
     {
         $filter = new TestFilter([]);
 
-        // loosy by default
+        // Loosy/like by default.
         $pfilter = new SimpleString();
         $query = $pfilter->apply('testcol', 'value', TestSimpleModel::query(), $filter);
 
@@ -31,7 +31,7 @@ class ParameterFiltersTest extends TestCase
         );
         static::assertEquals('%value%', $query->getBindings()[0], "Binding not correct for loosy default match");
 
-        // exact match
+        // Exact match.
         $pfilter = new SimpleString(null, null, true);
         $query = $pfilter->apply('testcol', 'value', TestSimpleModel::query(), $filter);
 
@@ -42,7 +42,7 @@ class ParameterFiltersTest extends TestCase
         );
         static::assertEquals('value', $query->getBindings()[0], "Binding not correct for exact match");
 
-        // custom table and column name
+        // Custom table and column name.
         $pfilter = new SimpleString('custom_table', 'custom_column');
         $query = $pfilter->apply('testcol', 'value', TestSimpleModel::query(), $filter);
 
@@ -62,7 +62,7 @@ class ParameterFiltersTest extends TestCase
     {
         $filter = new TestFilter([]);
 
-        // simple single integer
+        // Simple single integer.
         $pfilter = new SimpleInteger();
         $query = $pfilter->apply('testcol', 13, TestSimpleModel::query(), $filter);
 
@@ -73,7 +73,7 @@ class ParameterFiltersTest extends TestCase
         );
         static::assertEquals(13, $query->getBindings()[0], "Binding not correct for default single integer");
 
-        // custom operator
+        // Custom operator.
         $pfilter = new SimpleInteger(null, null, '>');
         $query = $pfilter->apply('testcol', 13, TestSimpleModel::query(), $filter);
 
@@ -84,7 +84,7 @@ class ParameterFiltersTest extends TestCase
         );
         static::assertEquals(13, $query->getBindings()[0], "Binding not correct for custom operator match");
 
-        // custom table and column name
+        // Custom table and column name.
         $pfilter = new SimpleInteger('custom_table', 'custom_column');
         $query = $pfilter->apply('testcol', 13, TestSimpleModel::query(), $filter);
 
@@ -95,7 +95,7 @@ class ParameterFiltersTest extends TestCase
         );
         static::assertEquals(13, $query->getBindings()[0], "Binding not correct for integer custom names match");
 
-        // whereIn match (array argument)
+        // WhereIn match (array argument).
         $pfilter = new SimpleInteger();
         $query = $pfilter->apply('testcol', [ 13, 14 ], TestSimpleModel::query(), $filter);
 

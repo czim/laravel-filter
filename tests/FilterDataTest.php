@@ -33,7 +33,7 @@ class FilterDataTest extends TestCase
      */
     public function it_throws_an_exception_if_invalid_data_is_passed_in(): void
     {
-        // see if we get the messages correctly
+        // See if we get the messages correctly.
         try {
             new TestFilterData([
                 'name'          => 'some name',
@@ -48,7 +48,7 @@ class FilterDataTest extends TestCase
 
         $this->expectException(FilterDataValidationFailedException::class);
 
-        // throw the exception, but don't catch it this time
+        // Throw the exception, but don't catch it this time.
         new TestFilterData([
             'name'          => 'some name',
             'relateds'      => 'string which should be an array',
@@ -70,10 +70,8 @@ class FilterDataTest extends TestCase
             'name' => 'some name',
         ]);
 
-        // check default
         static::assertFalse($data->getDefaults()['with_inactive'], 'Defaults not correct for test');
 
-        // check whether default was set
         static::assertFalse($data->getParameterValue('with_inactive'), 'Defaults were not set for parametervalues');
     }
 
@@ -86,17 +84,15 @@ class FilterDataTest extends TestCase
             [
                 'name' => 'some name',
             ],
-            // custom defaults
+            // Custom defaults:
             [
                 'name'          => null,
                 'with_inactive' => true,
             ]
         );
 
-        // check default
         static::assertTrue($data->getDefaults()['with_inactive'], 'Defaults not correct for test');
 
-        // check whether default was set
         static::assertTrue($data->getParameterValue('with_inactive'), 'Defaults were not set for parametervalues');
     }
 }
