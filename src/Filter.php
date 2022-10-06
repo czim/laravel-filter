@@ -4,6 +4,7 @@ namespace Czim\Filter;
 
 use Czim\Filter\Contracts\FilterDataInterface;
 use Czim\Filter\Contracts\ParameterFilterInterface;
+use Czim\Filter\Enums\JoinType;
 use Czim\Filter\Exceptions\FilterParameterUnhandledException;
 use Czim\Filter\Exceptions\ParameterStrategyInvalidException;
 use Illuminate\Contracts\Support\Arrayable;
@@ -15,6 +16,10 @@ use Throwable;
 class Filter implements Contracts\FilterInterface
 {
     public const SETTING = '_setting_';
+
+    protected const JOIN_METHOD_INNER = 'join';
+    protected const JOIN_METHOD_LEFT  = 'leftJoin';
+    protected const JOIN_METHOD_RIGHT = 'rightJoin';
 
     /**
      * The classname for the FilterData that should be constructed.
@@ -326,12 +331,12 @@ class Filter implements Contracts\FilterInterface
     public function addJoin(string $key, array $parameters, ?string $joinType = null): void
     {
         if ($joinType !== null) {
-            if ($joinType === 'join' || stripos($joinType, 'inner') !== false) {
-                $this->joinTypes[$key] = 'join';
-            } elseif (stripos($joinType, 'right') !== false) {
-                $this->joinTypes[$key] = 'rightJoin';
+            if ($joinType === JoinType::INNER || str_contains($joinType, 'inner')) {
+                $this->joinTypes[$key] = static::JOIN_METHOD_INNER;
+            } elseif ($joinType === JoinType::RIGHT) {
+                $this->joinTypes[$key] = static::JOIN_METHOD_RIGHT;
             } else {
-                unset($this->joinTypes[$key]);
+                unset($this->joinTypes[$key]); // let it default to left join.
             }
         }
 
@@ -346,7 +351,7 @@ class Filter implements Contracts\FilterInterface
     protected function applyJoins($query): void
     {
         foreach ($this->joins as $key => $join) {
-            $joinMethod = $this->joinTypes[ $key ] ?? 'leftJoin';
+            $joinMethod = $this->joinTypes[ $key ] ?? static::JOIN_METHOD_LEFT;
 
             call_user_func_array([ $query, $joinMethod ], $join);
         }
