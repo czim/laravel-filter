@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Czim\Filter\Test\Helpers;
 
 class TranslatableConfig

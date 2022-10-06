@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Czim\Filter\Test\Helpers;
 
 use Czim\Filter\FilterData;
@@ -9,7 +11,7 @@ class TestFilterData extends FilterData
     /**
      * {@inheritDoc}
      */
-    protected $rules = [
+    protected array $rules = [
         'name'                   => 'string',
         'relateds'               => 'array',
         'position'               => 'integer',
@@ -24,7 +26,7 @@ class TestFilterData extends FilterData
     /**
      * {@inheritDoc}
      */
-    protected $defaults = [
+    protected array $defaults = [
         'name'          => null,
         'relateds'      => [],
         'position'      => null,

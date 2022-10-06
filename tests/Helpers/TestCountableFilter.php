@@ -1,23 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Czim\Filter\Test\Helpers;
 
 use Czim\Filter\CountableFilter;
 use Czim\Filter\ParameterFilters;
 use Czim\Filter\ParameterCounters;
 use Czim\Filter\Test\Helpers\Models\TestSimpleModel;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Builder;
 
 class TestCountableFilter extends CountableFilter
 {
     /**
-     * @var string
+     * {@inheritDoc}
      */
-    protected $filterDataClass = TestCountableFilterData::class;
+    protected string $filterDataClass = TestCountableFilterData::class;
 
     /**
-     * @var string[]
+     * {@inheritDoc}
      */
-    protected $countables = [
+    protected array $countables = [
         'position',
         'relateds',
     ];
@@ -35,11 +40,9 @@ class TestCountableFilter extends CountableFilter
     }
 
     /**
-     * @param string                                $name
-     * @param mixed                                 $value
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * {@inheritDoc}
      */
-    protected function applyParameter(string $name, $value, $query)
+    protected function applyParameter(string $name, mixed $value, Model|Builder|EloquentBuilder $query): void
     {
         // Typical with inactive lookup.
         // Make sure we don't get the 'no fallback strategy' exception.
@@ -54,7 +57,7 @@ class TestCountableFilter extends CountableFilter
         parent::applyParameter($name, $value, $query);
     }
 
-    protected function getCountableBaseQuery(?string $parameter = null)
+    protected function getCountableBaseQuery(?string $parameter = null): Model|Builder|EloquentBuilder
     {
         return TestSimpleModel::query();
     }
@@ -70,8 +73,11 @@ class TestCountableFilter extends CountableFilter
         ];
     }
 
-    protected function countParameter(string $parameter, $query)
+    /**
+     * {@inheritDoc}
+     */
+    protected function countParameter(string $parameter, Model|Builder|EloquentBuilder $query): mixed
     {
-        parent::countParameter($parameter, $query);
+        return parent::countParameter($parameter, $query);
     }
 }

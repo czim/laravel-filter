@@ -1,10 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Czim\Filter\Test\Helpers;
 
 use Czim\Filter\Filter;
 use Czim\Filter\ParameterFilters\SimpleInteger;
 use Czim\Filter\ParameterFilters\SimpleString;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Builder;
 use RuntimeException;
 
 class TestFilter extends Filter
@@ -12,7 +17,7 @@ class TestFilter extends Filter
     /**
      * {@inheritDoc}
      */
-    protected $filterDataClass = TestFilterData::class;
+    protected string $filterDataClass = TestFilterData::class;
 
     /**
      * {@inheritDoc}
@@ -37,11 +42,9 @@ class TestFilter extends Filter
     }
 
     /**
-     * @param string                                $name
-     * @param mixed                                 $value
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * {@inheritDoc}
      */
-    protected function applyParameter(string $name, $value, $query)
+    protected function applyParameter(string $name, mixed $value, Model|Builder|EloquentBuilder $query): void
     {
         // Typical with inactive lookup.
         // Make sure we don't get the 'no fallback strategy' exception.
@@ -73,13 +76,16 @@ class TestFilter extends Filter
      *
      * Note that this cannot be a private method, or the [] syntax won't work.
      *
-     * @param string $name
-     * @param        $value
-     * @param        $query
-     * @return mixed
+     * @param string                        $name
+     * @param mixed                         $value
+     * @param Model|Builder|EloquentBuilder $query
+     * @return Model|Builder|EloquentBuilder
      */
-    protected function closureTestMethod(string $name, $value, $query)
-    {
+    protected function closureTestMethod(
+        string $name,
+        mixed $value,
+        Model|Builder|EloquentBuilder $query,
+    ): Model|Builder|EloquentBuilder {
         if (! is_array($value) || count($value) !== 2) {
             throw new RuntimeException("Value for '{$name}' not correctly passed through closure!");
         }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Czim\Filter\Test;
 
 use Czim\Filter\Test\Helpers\TranslatableConfig;
@@ -13,10 +15,7 @@ abstract class TestCase extends OrchestraTestCase
     protected const TABLE_NAME_TRANSLATIONS = 'test_simple_model_translations';
     protected const TABLE_NAME_RELATED      = 'test_related_models';
 
-    /**
-     * @var DatabaseManager
-     */
-    protected $db;
+    protected ?DatabaseManager $db;
 
     /**
      * {@inheritDoc}
@@ -46,8 +45,8 @@ abstract class TestCase extends OrchestraTestCase
 
     protected function migrateDatabase(): void
     {
-        // model we can test anything but translations with
-        Schema::create(self::TABLE_NAME_SIMPLE, function($table) {
+        // Model we can test anything but translations with.
+        Schema::create(self::TABLE_NAME_SIMPLE, function ($table): void {
             $table->increments('id');
             $table->string('unique_field', 20);
             $table->integer('second_field')->unsigned()->nullable();
@@ -58,8 +57,8 @@ abstract class TestCase extends OrchestraTestCase
             $table->timestamps();
         });
 
-        // model we can also test translations with
-        Schema::create(self::TABLE_NAME_RELATED, function($table) {
+        // Model we can also test translations with.
+        Schema::create(self::TABLE_NAME_RELATED, function ($table): void {
             $table->increments('id');
             $table->string('name', 255)->nullable();
             $table->string('some_property', 20)->nullable();
@@ -69,7 +68,7 @@ abstract class TestCase extends OrchestraTestCase
             $table->timestamps();
         });
 
-        Schema::create(self::TABLE_NAME_TRANSLATIONS, function($table) {
+        Schema::create(self::TABLE_NAME_TRANSLATIONS, function ($table): void {
             $table->increments('id');
             $table->integer('test_simple_model_id')->unsigned();
             $table->string('locale', 12);
