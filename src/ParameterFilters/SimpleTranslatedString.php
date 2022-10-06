@@ -1,11 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Czim\Filter\ParameterFilters;
 
 use Czim\Filter\Contracts\FilterInterface;
 use Czim\Filter\Contracts\ParameterFilterInterface;
 use Czim\Filter\Enums\JoinKey;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Str;
 
 /**
@@ -24,30 +28,11 @@ class SimpleTranslatedString implements ParameterFilterInterface
 {
     protected const TRANSLATION_TABLE_POSTFIX = '_translations';
 
-    /**
-     * @var string
-     */
-    protected $table;
-
-    /**
-     * @var string|null
-     */
-    protected $translationTable;
-
-    /**
-     * @var string|null
-     */
-    protected $column;
-
-    /**
-     * @var bool
-     */
-    protected $exact;
-
-    /**
-     * @var string|null
-     */
-    protected $locale;
+    protected string $table;
+    protected ?string $translationTable;
+    protected ?string $column;
+    protected string $locale;
+    protected bool $exact;
 
 
     /**
@@ -62,7 +47,7 @@ class SimpleTranslatedString implements ParameterFilterInterface
         ?string $translationTable = null,
         ?string $column = null,
         ?string $locale = null,
-        bool $exact = false
+        bool $exact = false,
     ) {
         if (empty($translationTable)) {
             $translationTable = Str::singular($table) . self::TRANSLATION_TABLE_POSTFIX;
@@ -79,40 +64,79 @@ class SimpleTranslatedString implements ParameterFilterInterface
         $this->exact            = $exact;
     }
 
-    /**
-     * @param string          $name
-     * @param mixed           $value
-     * @param EloquentBuilder $query
-     * @param FilterInterface $filter
-     * @return EloquentBuilder
-     */
-    public function apply(string $name, $value, $query, FilterInterface $filter)
-    {
+    public function apply(
+        string $name,
+        mixed $value,
+        Model|Builder|EloquentBuilder $query,
+        FilterInterface $filter,
+    ): Model|Builder|EloquentBuilder {
         $column = $this->translationTable . '.'
             . (! empty($this->column) ? $this->column : $name);
 
-        $operator = '=';
-
-        if (! $this->exact) {
-            $operator = 'LIKE';
-            $value    = '%' . $value . '%';
-        }
-
-        $query->where($this->translationTable . '.locale', $this->locale)
-            ->where($column, $operator, $value);
+        $query
+            ->where($this->qualifiedLocaleColumn(), $this->locale)
+            ->where($column, $this->getComparisonOperator(), $this->makeValueToCompare($value));
 
 
-        // add a join for the translations
+        // Add a join for the translations, using the generic join key.
         $filter->addJoin(
-            JoinKey::TRANSLATIONS,
-            [
-                $this->translationTable,
-                $this->translationTable . '.' . Str::singular($this->table) . '_id',
-                '=',
-                $this->table . '.id',
-            ]
+            $this->joinKeyForTranslations(),
+            [$this->translationTable, $this->qualifiedForeignKeyName(), '=', $this->qualifiedTableKeyName()]
         );
 
         return $query;
+    }
+
+    protected function getComparisonOperator(): string
+    {
+        if ($this->exact) {
+            return '=';
+        }
+
+        return 'like';
+    }
+
+    protected function makeValueToCompare(mixed $value): string
+    {
+        if ($this->exact) {
+            return (string) $value;
+        }
+
+        return '%' . $value . '%';
+    }
+
+    protected function qualifiedLocaleColumn(): string
+    {
+        return $this->translationTable . '.' . $this->localeColumnName();
+    }
+
+    protected function localeColumnName(): string
+    {
+        return 'locale';
+    }
+
+    protected function qualifiedTableKeyName(): string
+    {
+        return $this->table . '.' . $this->localKeyName();
+    }
+
+    protected function localKeyName(): string
+    {
+        return 'id';
+    }
+
+    protected function qualifiedForeignKeyName(): string
+    {
+        return $this->translationTable . '.' . $this->foreignKeyName();
+    }
+
+    protected function foreignKeyName(): string
+    {
+        return Str::singular($this->table) . '_id';
+    }
+
+    protected function joinKeyForTranslations(): string
+    {
+        return JoinKey::TRANSLATIONS;
     }
 }

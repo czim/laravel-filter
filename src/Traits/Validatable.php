@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Czim\Filter\Traits;
 
 use Illuminate\Contracts\Support\MessageBag as MessageBagContract;
+use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Support\MessageBag;
-use Validator;
+use Illuminate\Support\Facades\Validator as ValidatorFacade;
+use UnexpectedValueException;
 
 /**
  * Allow a class to be validated with validate()
@@ -17,30 +21,37 @@ use Validator;
  */
 trait Validatable
 {
-    /**
-     * @var Validator|null
-     */
-    protected $validator;
+    protected ValidatorContract $validator;
 
 
     public function validate(): bool
     {
-        $this->validator = Validator::make($this->getAttributes(), $this->getRules());
+        $this->validator = $this->makeValidatorInstance();
 
         return ! $this->validator->fails();
     }
 
+    protected function makeValidatorInstance(): ValidatorContract
+    {
+        return ValidatorFacade::make($this->getAttributes(), $this->getRules());
+    }
+
     public function messages(): MessageBagContract
     {
-        if ($this->validator === null) {
+        if (! isset($this->validator)) {
             $this->validate();
         }
 
-        if (! $this->validator->fails()) {
-            return app(MessageBag::class);
+        if ($this->validator->fails()) {
+            return $this->validator->messages();
         }
 
-        return $this->validator->messages();
+        return $this->makeEmptyMessageBag();
+    }
+
+    protected function makeEmptyMessageBag(): MessageBagContract
+    {
+        return new MessageBag();
     }
 
     /**
@@ -48,11 +59,11 @@ trait Validatable
      */
     public function getRules(): array
     {
-        if (isset($this->rules)) {
-            return $this->rules;
+        if (! property_exists($this, 'rules')) {
+            return [];
         }
 
-        return [];
+        return $this->rules ?? [];
     }
 
     /**
@@ -60,6 +71,11 @@ trait Validatable
      */
     public function setRules(array $rules): void
     {
+        if (! property_exists($this, 'rules')) {
+            // Don't allow dynamic property assignment anymore.
+            throw new UnexpectedValueException('No rules property available to set rules on');
+        }
+
         $this->rules = $rules;
     }
 }

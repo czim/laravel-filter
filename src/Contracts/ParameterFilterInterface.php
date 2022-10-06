@@ -3,18 +3,15 @@
 namespace Czim\Filter\Contracts;
 
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Builder;
 
 interface ParameterFilterInterface
 {
-    /**
-     * Applies parameter filtering for a given query
-     *
-     * @param string          $name
-     * @param mixed           $value
-     * @param EloquentBuilder $query
-     * @param FilterInterface $filter
-     * @return EloquentBuilder
-     */
-    public function apply(string $name, $value, $query, FilterInterface $filter);
-
+    public function apply(
+        string $name,
+        mixed $value,
+        Model|Builder|EloquentBuilder $query,
+        FilterInterface $filter,
+    ): Model|Builder|EloquentBuilder;
 }

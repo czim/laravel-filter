@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Czim\Filter;
 
 use Czim\Filter\Exceptions\FilterDataValidationFailedException;
@@ -16,14 +18,14 @@ class FilterData implements Contracts\FilterDataInterface, Contracts\Validatable
      *
      * @var array<string, mixed>
      */
-    protected $attributes = [];
+    protected array $attributes = [];
 
     /**
      * Validation rules for filter.
      *
      * @var array<string, mixed>
      */
-    protected $rules = [];
+    protected array $rules = [];
 
     /**
      * Default values. Anything NOT listed here will NOT be applied in queries.
@@ -31,7 +33,7 @@ class FilterData implements Contracts\FilterDataInterface, Contracts\Validatable
      *
      * @var array<string, mixed>
      */
-    protected $defaults = [];
+    protected array $defaults = [];
 
 
     /**
@@ -56,6 +58,9 @@ class FilterData implements Contracts\FilterDataInterface, Contracts\Validatable
         $this->attributes = array_merge($this->defaults, $this->attributes);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toArray(): array
     {
         return $this->attributes;
@@ -109,11 +114,7 @@ class FilterData implements Contracts\FilterDataInterface, Contracts\Validatable
         }
     }
 
-    /**
-     * @param string $name
-     * @return mixed
-     */
-    public function getParameterValue(string $name)
+    public function getParameterValue(string $name): mixed
     {
         return $this->attributes[ $name ] ?? null;
     }

@@ -4,43 +4,19 @@ namespace Czim\Filter\Contracts;
 
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Builder;
 
 interface FilterInterface
 {
     public function setFilterData(FilterDataInterface $data): void;
     public function getFilterData(): FilterDataInterface;
 
-    /**
-     * Setter for global settings.
-     *
-     * @param string $key
-     * @param mixed  $value
-     */
-    public function setSetting(string $key, $value = null): void;
+    public function setSetting(string $key, mixed $value = null): void;
+    public function setting(string $key): mixed;
 
-    /**
-     * Getter for global settings.
-     *
-     * @param string $key
-     * @return mixed
-     */
-    public function setting(string $key);
+    public function parameterValue(string $name): mixed;
 
-    /**
-     * Returns parameter value set in filter data.
-     *
-     * @param string $name
-     * @return mixed
-     */
-    public function parameterValue(string $name);
-
-    /**
-     * Applies the loaded FilterData to a query builder.
-     *
-     * @param Model|EloquentBuilder $query
-     * @return EloquentBuilder
-     */
-    public function apply($query);
+    public function apply(Model|Builder|EloquentBuilder $query): Model|Builder|EloquentBuilder;
 
     /**
      * Adds a query join to be added after all parameters are applied.

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Czim\Filter;
 
 use Czim\Filter\Contracts\CountableFilterInterface;
@@ -7,8 +9,9 @@ use Czim\Filter\Contracts\FilterDataInterface;
 use Czim\Filter\Contracts\ParameterCounterInterface;
 use Czim\Filter\Exceptions\FilterParameterUnhandledException;
 use Czim\Filter\Exceptions\ParameterStrategyInvalidException;
-use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Builder;
 use ReflectionClass;
 use Throwable;
 
@@ -28,7 +31,7 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
      *
      * @var string[]
      */
-    protected $countables = [];
+    protected array $countables = [];
 
     /**
      * Application strategies for all countables to get counts for.
@@ -42,16 +45,16 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
      *      null, which means that getCountForParameter() will be called on the Filter
      *          itself, which MUST then be able to handle it!
      *
-     * @var array<string, mixed> by countable name
+     * @var array<string, ParameterCounterInterface|class-string<ParameterCounterInterface>|callable|null> by name
      */
-    protected $countStrategies = [];
+    protected array $countStrategies = [];
 
     /**
      * List of countables that should not be included in getCount() results.
      *
      * @var string[]
      */
-    protected $ignoreCountables = [];
+    protected array $ignoreCountables = [];
 
     /**
      * List of countables that should be applied even when performing a count for that same countable.
@@ -61,24 +64,25 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
      *
      * @var string[]
      */
-    protected $includeSelfInCount = [];
+    protected array $includeSelfInCount = [];
 
 
     /**
      * Returns new base query object to build countable query on.
+     *
      * This will be called for each countable parameter, and could be
      * something like: EloquentModelName::query();
      *
      * @param string|null $parameter name of the countable parameter
-     * @return EloquentBuilder
+     * @return Model|Builder|EloquentBuilder
      */
-    abstract protected function getCountableBaseQuery(?string $parameter = null);
+    abstract protected function getCountableBaseQuery(?string $parameter = null): Model|Builder|EloquentBuilder;
 
 
     /**
-     * @param array|Arrayable|FilterDataInterface $data
+     * {@inheritDoc}
      */
-    public function __construct($data)
+    public function __construct(array|FilterDataInterface $data)
     {
         parent::__construct($data);
 
@@ -90,7 +94,7 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
      *
      * Override this to set the countable strategies for your filter.
      *
-     * @return array<string, mixed>
+     * @return array<string, ParameterCounterInterface|class-string<ParameterCounterInterface>|callable|null> by name
      */
     protected function countStrategies(): array
     {
@@ -128,7 +132,7 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
     {
         $counts = new CountableResults();
 
-        $strategies = $this->buildCountableStrategies();
+        $strategies = $this->normalizeCountableStrategies();
 
         // Determine which countables to count for.
         if (! empty($countables)) {
@@ -143,11 +147,7 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
                 continue;
             }
 
-            if (isset($strategies[$parameterName])) {
-                $strategy = $strategies[ $parameterName ];
-            } else {
-                $strategy = null;
-            }
+            $strategy = $strategies[ $parameterName ] ?? null;
 
             // normalize the strategy so that we can call_user_func on it
             if ($strategy instanceof ParameterCounterInterface) {
@@ -192,12 +192,12 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
      *
      * Override this if you need to use it in a specific Filter instance
      *
-     * @param string          $parameter countable name
-     * @param EloquentBuilder $query
+     * @param string                        $parameter countable name
+     * @param Model|Builder|EloquentBuilder $query
      * @return mixed
      * @throws FilterParameterUnhandledException
      */
-    protected function countParameter(string $parameter, $query)
+    protected function countParameter(string $parameter, Model|Builder|EloquentBuilder $query): mixed
     {
         // Default is to always warn that we don't have a strategy.
         throw new FilterParameterUnhandledException(
@@ -208,39 +208,41 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
     /**
      * Builds up the strategies so that all instantiatable strategies are instantiated.
      *
-     * @return array<string, mixed>
+     * @return array<string, ParameterCounterInterface|callable|null> by name
      * @throws ParameterStrategyInvalidException
      */
-    protected function buildCountableStrategies(): array
+    protected function normalizeCountableStrategies(): array
     {
         foreach ($this->countStrategies as &$strategy) {
             // check if the strategy is a string that should be instantiated as a class
-            if (is_string($strategy)) {
-                try {
-                    $reflection = new ReflectionClass($strategy);
+            if (! is_string($strategy)) {
+                continue;
+            }
 
-                    if (! $reflection->isInstantiable()) {
-                        throw new ParameterStrategyInvalidException(
-                            "Uninstantiable string provided as countStrategy for '{$strategy}'"
-                        );
-                    }
+            try {
+                $reflection = new ReflectionClass($strategy);
 
-                    $strategy = new $strategy();
-                } catch (Throwable $e) {
+                if (! $reflection->isInstantiable()) {
                     throw new ParameterStrategyInvalidException(
-                        'Exception thrown while trying to reflect or instantiate string '
-                        . "provided as countStrategy for '{$strategy}'",
-                        0,
-                        $e
+                        "Uninstantiable string provided as countStrategy for '{$strategy}'"
                     );
                 }
 
-                // Check if it is of the correct type.
-                if (! $strategy instanceof ParameterCounterInterface) {
-                    throw new ParameterStrategyInvalidException(
-                        "Instantiated string provided is not a ParameterFilter: '" . get_class($strategy) . "'"
-                    );
-                }
+                $strategy = new $strategy();
+            } catch (Throwable $e) {
+                throw new ParameterStrategyInvalidException(
+                    'Exception thrown while trying to reflect or instantiate string '
+                    . "provided as countStrategy for '{$strategy}'",
+                    0,
+                    $e
+                );
+            }
+
+            // Check if it is of the correct type.
+            if (! $strategy instanceof ParameterCounterInterface) {
+                throw new ParameterStrategyInvalidException(
+                    "Instantiated string provided is not a ParameterFilter: '" . get_class($strategy) . "'"
+                );
             }
         }
 

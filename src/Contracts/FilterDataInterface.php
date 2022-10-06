@@ -20,11 +20,7 @@ interface FilterDataInterface extends Arrayable
      */
     public function getApplicableAttributes(): array;
 
-    /**
-     * @param string $name
-     * @return mixed
-     */
-    public function getParameterValue(string $name);
+    public function getParameterValue(string $name): mixed;
 
     /**
      * @return array<string, mixed>

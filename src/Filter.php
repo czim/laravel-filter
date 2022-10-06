@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Czim\Filter;
 
 use Czim\Filter\Contracts\FilterDataInterface;
@@ -7,9 +9,9 @@ use Czim\Filter\Contracts\ParameterFilterInterface;
 use Czim\Filter\Enums\JoinType;
 use Czim\Filter\Exceptions\FilterParameterUnhandledException;
 use Czim\Filter\Exceptions\ParameterStrategyInvalidException;
-use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Builder;
 use ReflectionClass;
 use Throwable;
 
@@ -25,9 +27,9 @@ class Filter implements Contracts\FilterInterface
      * The classname for the FilterData that should be constructed when the filter is
      * constructed with plain array data.
      *
-     * @var string
+     * @var class-string<FilterDataInterface>
      */
-    protected $filterDataClass = FilterData::class;
+    protected string $filterDataClass = FilterData::class;
 
     /**
      * Application strategies for all parameters/attributes to apply for
@@ -41,21 +43,18 @@ class Filter implements Contracts\FilterInterface
      *      null, which means that applyParameter() will be called on the Filter
      *          itself, which MUST then be able to handle it!
      *
-     * @var array<string, mixed> by parameter name
+     * @var array<string, ParameterFilterInterface|class-string<ParameterFilterInterface>|string|callable|null> by name
      */
-    protected $strategies = [];
+    protected array $strategies = [];
 
-    /**
-     * @var FilterDataInterface
-     */
-    protected $data;
+    protected FilterDataInterface $data;
 
     /**
      * Settings for the filter, filled automatically for parameters that have the Filter::SETTING strategy flag set.
      *
      * @var array<string, mixed>
      */
-    protected $settings = [];
+    protected array $settings = [];
 
     /**
      * Join memory: set join parameters for query->join() calls here, so they may be applied once and
@@ -63,7 +62,7 @@ class Filter implements Contracts\FilterInterface
      *
      * @var array<string, mixed>
      */
-    protected $joins = [];
+    protected array $joins = [];
 
     /**
      * Join memory for type of join, defaults to left.
@@ -71,7 +70,7 @@ class Filter implements Contracts\FilterInterface
      *
      * @var array<string, string>
      */
-    protected $joinTypes = [];
+    protected array $joinTypes = [];
 
     /**
      * Parameter names to be ignored while applying the filter
@@ -80,16 +79,17 @@ class Filter implements Contracts\FilterInterface
      *
      * @var string[]
      */
-    protected $ignoreParameters = [];
+    protected array $ignoreParameters = [];
+
 
     /**
-     * @param array|Arrayable|FilterDataInterface $data
+     * @param array<string, mixed>|FilterDataInterface $data
      */
-    public function __construct($data)
+    public function __construct(array|FilterDataInterface $data)
     {
         // create FilterData if provided data is not already
         if (! $data instanceof FilterDataInterface) {
-            $data = new $this->filterDataClass($data);
+            $data = $this->instantiateFilterData($data);
         }
 
         $this->setFilterData($data);
@@ -97,19 +97,11 @@ class Filter implements Contracts\FilterInterface
         $this->strategies = $this->strategies();
     }
 
-    /**
-     * Initializes strategies for filtering.
-     * Override this to set the strategies for your filter.
-     *
-     * @return array<string, mixed>
-     */
-    protected function strategies(): array
-    {
-        return [];
-    }
 
     public function setFilterData(FilterDataInterface $data): void
     {
+        assert(is_a($data, $this->filterDataClass), 'Filter data must match configured data class');
+
         $this->data = $data;
     }
 
@@ -118,32 +110,17 @@ class Filter implements Contracts\FilterInterface
         return $this->data;
     }
 
-    /**
-     * @param string $key
-     * @param mixed  $value
-     */
-    public function setSetting(string $key, $value = null): void
+    public function setSetting(string $key, mixed $value = null): void
     {
         $this->settings[$key] = $value;
     }
 
-    /**
-     * @param string $key
-     * @return mixed|null
-     */
-    public function setting(string $key)
+    public function setting(string $key): mixed
     {
         return $this->settings[$key] ?? null;
     }
 
-    /**
-     * Returns parameter value set in filter data.
-     * Convenience method.
-     *
-     * @param string $name
-     * @return mixed
-     */
-    public function parameterValue(string $name)
+    public function parameterValue(string $name): mixed
     {
         return $this->data->getParameterValue($name);
     }
@@ -151,11 +128,11 @@ class Filter implements Contracts\FilterInterface
     /**
      * Applies the loaded FilterData to a query (builder).
      *
-     * @param Model|EloquentBuilder $query
-     * @return EloquentBuilder
+     * @param Model|Builder|EloquentBuilder $query
+     * @return Model|Builder|EloquentBuilder
      * @throws ParameterStrategyInvalidException
      */
-    public function apply($query)
+    public function apply(Model|Builder|EloquentBuilder $query): Model|Builder|EloquentBuilder
     {
         $this->forgetJoins();
         $this->applyParameters($query);
@@ -167,10 +144,10 @@ class Filter implements Contracts\FilterInterface
     /**
      * Applies all filter parameters to the query, using the configured strategies.
      *
-     * @param Model|EloquentBuilder $query
+     * @param Model|Builder|EloquentBuilder $query
      * @throws ParameterStrategyInvalidException
      */
-    protected function applyParameters($query)
+    protected function applyParameters(Model|Builder|EloquentBuilder $query): void
     {
         $this->storeGlobalSettings();
 
@@ -219,13 +196,12 @@ class Filter implements Contracts\FilterInterface
     /**
      * Builds up the strategies so that all instantiatable strategies are instantiated.
      *
-     * @return array<string, mixed>
+     * @return array<string, ParameterFilterInterface|string|callable|null> by name
      * @throws ParameterStrategyInvalidException
      */
     protected function buildStrategies(): array
     {
         foreach ($this->strategies as $parameterName => &$strategy) {
-            // only build strategies we will actually use
             if ($this->isParameterIgnored($parameterName)) {
                 continue;
             }
@@ -238,31 +214,34 @@ class Filter implements Contracts\FilterInterface
                 continue;
             }
 
-            // check if the strategy is a string that should be instantiated as a class
-            if (is_string($strategy) && $strategy !== static::SETTING) {
-                try {
-                    $reflection = new ReflectionClass($strategy);
+            // Check if the strategy is a string that should be instantiated as a class.
+            if (! is_string($strategy) || $strategy === static::SETTING) {
+                continue;
+            }
 
-                    if (! $reflection->IsInstantiable()) {
-                        throw new ParameterStrategyInvalidException(
-                            "Uninstantiable string provided as strategy for '{$strategy}'"
-                        );
-                    }
+            try {
+                $reflection = new ReflectionClass($strategy);
 
-                    $strategy = new $strategy();
-                } catch (Throwable $e) {
+                if (! $reflection->IsInstantiable()) {
                     throw new ParameterStrategyInvalidException(
-                        "Exception thrown while trying to reflect or instantiate string provided as strategy for '{$strategy}'",
-                        0, $e
+                        "Uninstantiable string provided as strategy for '{$strategy}'"
                     );
                 }
 
-                // check if it is of the correct type
-                if (! $strategy instanceof ParameterFilterInterface) {
-                    throw new ParameterStrategyInvalidException(
-                        "Instantiated string provided is not a ParameterFilter: '" . get_class($strategy) . "'"
-                    );
-                }
+                $strategy = new $strategy();
+            } catch (Throwable $exception) {
+                throw new ParameterStrategyInvalidException(
+                    "Exception thrown while trying to reflect or instantiate strategy string for '{$strategy}'",
+                    0,
+                    $exception
+                );
+            }
+
+            // check if it is of the correct type
+            if (! $strategy instanceof ParameterFilterInterface) {
+                throw new ParameterStrategyInvalidException(
+                    "Instantiated string provided is not a ParameterFilter: '" . get_class($strategy) . "'"
+                );
             }
         }
 
@@ -281,7 +260,7 @@ class Filter implements Contracts\FilterInterface
     protected function storeGlobalSettings(): void
     {
         foreach ($this->strategies as $setting => &$strategy) {
-            if (! is_string($strategy) || $strategy !== static::SETTING) {
+            if ($strategy !== static::SETTING) {
                 continue;
             }
 
@@ -295,16 +274,16 @@ class Filter implements Contracts\FilterInterface
      *
      * Override this if you need to use it in a specific Filter instance.
      *
-     * @param string          $parameterName
-     * @param mixed|null      $parameterValue
-     * @param EloquentBuilder $query
+     * @param string                        $name
+     * @param mixed|null                    $value
+     * @param Model|Builder|EloquentBuilder $query
      * @throws FilterParameterUnhandledException
      */
-    protected function applyParameter(string $parameterName, $parameterValue, $query)
+    protected function applyParameter(string $name, mixed $value, Model|Builder|EloquentBuilder $query): void
     {
         // Default is to always warn that we don't have a strategy.
         throw new FilterParameterUnhandledException(
-            "No fallback strategy determined for for filter parameter '{$parameterName}'"
+            "No fallback strategy determined for for filter parameter '{$name}'"
         );
     }
 
@@ -316,9 +295,9 @@ class Filter implements Contracts\FilterInterface
     /**
      * Adds a query join to be added after all parameters are applied.
      *
-     * @param string      $key        identifying key, used to prevent duplicates
-     * @param mixed[]     $parameters
-     * @param string|null $joinType   'inner', 'right', defaults to left join
+     * @param string               $key         identifying key, used to prevent duplicates
+     * @param array<string, mixed> $parameters
+     * @param string|null          $joinType   {@link JoinType} 'join'/'inner', 'right'; defaults to left join
      */
     public function addJoin(string $key, array $parameters, ?string $joinType = null): void
     {
@@ -335,12 +314,7 @@ class Filter implements Contracts\FilterInterface
         $this->joins[$key] = $parameters;
     }
 
-    /**
-     * Applies joins to the filter-based query.
-     *
-     * @param EloquentBuilder $query
-     */
-    protected function applyJoins($query): void
+    protected function applyJoins(Model|Builder|EloquentBuilder $query): void
     {
         foreach ($this->joins as $key => $join) {
             $joinMethod = $this->joinTypes[ $key ] ?? static::JOIN_METHOD_LEFT;
@@ -349,33 +323,16 @@ class Filter implements Contracts\FilterInterface
         }
     }
 
-    /**
-     * Returns whether a given parameter's value should be treated as empty or unset.
-     *
-     * @param string $parameter
-     * @param mixed  $value
-     * @return bool
-     */
-    protected function isParameterValueUnset(string $parameter, $value): bool
+    protected function isParameterValueUnset(string $parameter, mixed $value): bool
     {
         return $value !== false && empty($value);
     }
 
-    /**
-     * Ignores a previously ignored parameter for building the filter.
-     *
-     * @param string $parameter
-     */
     protected function ignoreParameter(string $parameter): void
     {
         $this->ignoreParameters = array_merge($this->ignoreParameters, [$parameter]);
     }
 
-    /**
-     * Unignores a previously ignored parameter for building the filter.
-     *
-     * @param string $parameter
-     */
     protected function unignoreParameter(string $parameter): void
     {
         $this->ignoreParameters = array_diff($this->ignoreParameters, [$parameter]);
@@ -388,5 +345,23 @@ class Filter implements Contracts\FilterInterface
         }
 
         return in_array($parameterName, $this->ignoreParameters, true);
+    }
+
+
+    protected function instantiateFilterData(array $data): FilterDataInterface
+    {
+        return new $this->filterDataClass($data);
+    }
+
+    /**
+     * Initializes strategies for filtering.
+     *
+     * Override this to set the strategies for your filter.
+     *
+     * @return array<string, ParameterFilterInterface|class-string<ParameterFilterInterface>|string|callable|null> by name
+     */
+    protected function strategies(): array
+    {
+        return [];
     }
 }

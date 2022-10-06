@@ -1,12 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Czim\Filter\ParameterCounters;
 
 use Czim\Filter\Contracts\CountableFilterInterface;
 use Czim\Filter\Contracts\ParameterCounterInterface;
-use DB;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
@@ -22,31 +26,6 @@ use Illuminate\Support\Str;
 class SimpleBelongsTo implements ParameterCounterInterface
 {
     /**
-     * @var string
-     */
-    protected $columnName;
-
-    /**
-     * @var bool
-     */
-    protected $includeEmpty;
-
-    /**
-     * @var string
-     */
-    protected $countRaw;
-
-    /**
-     * @var string
-     */
-    protected $columnAlias;
-
-    /**
-     * @var string
-     */
-    protected $countAlias;
-
-    /**
      * @param string|null $columnName   the column name to count, always used unless null
      * @param bool        $includeEmpty whether to also count for NULL, default is to exclude
      * @param string      $countRaw     the raw SQL count statement ('COUNT(*)')
@@ -54,29 +33,27 @@ class SimpleBelongsTo implements ParameterCounterInterface
      * @param string      $countAlias   an alias for the count ('count')
      */
     public function __construct(
-        ?string $columnName = null,
-        bool $includeEmpty = false,
-        string $countRaw = 'COUNT(*)',
-        string $columnAlias = 'id',
-        string $countAlias = 'count'
+        protected readonly ?string $columnName = null,
+        protected readonly bool $includeEmpty = false,
+        protected readonly string $countRaw = 'COUNT(*)',
+        protected readonly string $columnAlias = 'id',
+        protected readonly string $countAlias = 'count',
     ) {
-        $this->columnName   = $columnName;
-        $this->includeEmpty = $includeEmpty;
-        $this->countRaw     = $countRaw;
-        $this->columnAlias  = $columnAlias;
-        $this->countAlias   = $countAlias;
     }
 
     /**
      * Returns the count for a countable parameter, given the query provided.
      *
-     * @param string                   $name
-     * @param EloquentBuilder          $query
-     * @param CountableFilterInterface $filter
+     * @param string                        $name
+     * @param Model|Builder|EloquentBuilder $query
+     * @param CountableFilterInterface      $filter
      * @return Collection<string, int>
      */
-    public function count(string $name, $query, CountableFilterInterface $filter)
-    {
+    public function count(
+        string $name,
+        Model|Builder|EloquentBuilder $query,
+        CountableFilterInterface $filter,
+    ): Collection {
         $columnName = $this->determineColumnName($name);
 
         if (! $this->includeEmpty) {
