@@ -43,7 +43,7 @@ trait Validatable
         }
 
         if ($this->validator->fails()) {
-            return $this->validator->messages();
+            return $this->validator->errors();
         }
 
         return $this->makeEmptyMessageBag();
