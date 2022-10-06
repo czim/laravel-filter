@@ -4,8 +4,8 @@ namespace Czim\Filter\Test;
 
 use Czim\Filter\ParameterFilters\SimpleInteger;
 use Czim\Filter\ParameterFilters\SimpleString;
+use Czim\Filter\Test\Helpers\Models\TestSimpleModel;
 use Czim\Filter\Test\Helpers\TestFilter;
-use Czim\Filter\Test\Helpers\TestSimpleModel;
 
 class ParameterFiltersTest extends TestCase
 {

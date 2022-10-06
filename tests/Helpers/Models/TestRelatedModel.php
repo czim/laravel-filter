@@ -1,11 +1,16 @@
 <?php
 
-namespace Czim\Filter\Test\Helpers;
+declare(strict_types=1);
+
+namespace Czim\Filter\Test\Helpers\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @mixin \Eloquent
+ */
 class TestRelatedModel extends Model
 {
     /**
@@ -17,8 +22,6 @@ class TestRelatedModel extends Model
         'test_simple_model_id',
         'active',
     ];
-
-    // some relations for testing
 
     public function TestSimpleModel(): BelongsTo
     {

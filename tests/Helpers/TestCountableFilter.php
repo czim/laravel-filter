@@ -5,6 +5,7 @@ namespace Czim\Filter\Test\Helpers;
 use Czim\Filter\CountableFilter;
 use Czim\Filter\ParameterFilters;
 use Czim\Filter\ParameterCounters;
+use Czim\Filter\Test\Helpers\Models\TestSimpleModel;
 
 class TestCountableFilter extends CountableFilter
 {

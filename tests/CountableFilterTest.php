@@ -3,9 +3,9 @@
 namespace Czim\Filter\Test;
 
 use Czim\Filter\Contracts\CountableFilterInterface;
+use Czim\Filter\Test\Helpers\Models\TestRelatedModel;
+use Czim\Filter\Test\Helpers\Models\TestSimpleModel;
 use Czim\Filter\Test\Helpers\TestCountableFilter;
-use Czim\Filter\Test\Helpers\TestRelatedModel;
-use Czim\Filter\Test\Helpers\TestSimpleModel;
 
 class CountableFilterTest extends TestCase
 {

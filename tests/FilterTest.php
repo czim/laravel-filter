@@ -5,10 +5,10 @@ namespace Czim\Filter\Test;
 use Czim\Filter\Contracts\FilterInterface;
 use Czim\Filter\Exceptions\FilterParameterUnhandledException;
 use Czim\Filter\Exceptions\ParameterStrategyInvalidException;
+use Czim\Filter\Test\Helpers\Models\TestRelatedModel;
+use Czim\Filter\Test\Helpers\Models\TestSimpleModel;
 use Czim\Filter\Test\Helpers\TestFilter;
 use Czim\Filter\Test\Helpers\TestFilterData;
-use Czim\Filter\Test\Helpers\TestRelatedModel;
-use Czim\Filter\Test\Helpers\TestSimpleModel;
 
 class FilterTest extends TestCase
 {
