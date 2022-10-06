@@ -23,6 +23,7 @@ This is not a ready-to-use package, but a framework you can extend for your own 
 | 5.8 and below | 7.0+ | 1.1     |
 | 6.0 to 7.0    | 7.1+ | 2.0     |
 | 6.0 and up    | 7.2+ | 3.1     |
+| 9.0 and up    | 8.1+ | 4.0     |
 
 ## Changelog
 
