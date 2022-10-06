@@ -6,6 +6,9 @@ namespace Czim\Filter\Enums;
 
 use MyCLabs\Enum\Enum;
 
+/**
+ * @extends Enum<string>
+ */
 class JoinType extends Enum
 {
     public const INNER = 'join';

@@ -21,6 +21,11 @@ use Throwable;
  * say, product line and brand, then this should look up:
  *      the number of matches for all brands that also match the product line filter,
  *      and the number of matches for all product lines that also match the brand filter
+ *
+ * @template TModel of \Illuminate\Database\Eloquent\Model
+ *
+ * @extends Filter<TModel>
+ * @implements CountableFilterInterface<TModel>
  */
 abstract class CountableFilter extends Filter implements CountableFilterInterface
 {
@@ -45,7 +50,7 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
      *      null, which means that getCountForParameter() will be called on the Filter
      *          itself, which MUST then be able to handle it!
      *
-     * @var array<string, ParameterCounterInterface|class-string<ParameterCounterInterface>|callable|null> by name
+     * @var array<string, ParameterCounterInterface<TModel>|class-string<ParameterCounterInterface<TModel>>|callable|null> by name
      */
     protected array $countStrategies = [];
 
@@ -74,7 +79,7 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
      * something like: EloquentModelName::query();
      *
      * @param string|null $parameter name of the countable parameter
-     * @return Model|Builder|EloquentBuilder
+     * @return TModel|Builder|EloquentBuilder<TModel>
      */
     abstract protected function getCountableBaseQuery(?string $parameter = null): Model|Builder|EloquentBuilder;
 
@@ -94,7 +99,7 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
      *
      * Override this to set the countable strategies for your filter.
      *
-     * @return array<string, ParameterCounterInterface|class-string<ParameterCounterInterface>|callable|null> by name
+     * @return array<string, ParameterCounterInterface<TModel>|class-string<ParameterCounterInterface<TModel>>|callable|null> by name
      */
     protected function countStrategies(): array
     {
@@ -125,7 +130,7 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
      * Gets alternative counts per (relevant) attribute for the filter data.
      *
      * @param string[] $countables overrides ignoredCountables
-     * @return CountableResults
+     * @return CountableResults<string, mixed>
      * @throws ParameterStrategyInvalidException
      */
     public function getCounts(array $countables = []): CountableResults
@@ -179,6 +184,8 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
                 $this->unignoreParameter($parameterName);
             }
 
+            /** @var callable $strategy */
+
             // Retrieve the count and put it in the results.
             $counts->put($parameterName, $strategy($parameterName, $query, $this));
         }
@@ -192,8 +199,8 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
      *
      * Override this if you need to use it in a specific Filter instance
      *
-     * @param string                        $parameter countable name
-     * @param Model|Builder|EloquentBuilder $query
+     * @param string                                 $parameter countable name
+     * @param TModel|Builder|EloquentBuilder<TModel> $query
      * @return mixed
      * @throws FilterParameterUnhandledException
      */
@@ -208,7 +215,7 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
     /**
      * Builds up the strategies so that all instantiatable strategies are instantiated.
      *
-     * @return array<string, ParameterCounterInterface|callable|null> by name
+     * @return array<string, ParameterCounterInterface<TModel>|callable|null> by name
      * @throws ParameterStrategyInvalidException
      */
     protected function normalizeCountableStrategies(): array
@@ -218,6 +225,8 @@ abstract class CountableFilter extends Filter implements CountableFilterInterfac
             if (! is_string($strategy)) {
                 continue;
             }
+
+            /** @var class-string<ParameterCounterInterface<TModel>> $strategy */
 
             try {
                 $reflection = new ReflectionClass($strategy);

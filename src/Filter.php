@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Czim\Filter;
 
 use Czim\Filter\Contracts\FilterDataInterface;
+use Czim\Filter\Contracts\FilterInterface;
 use Czim\Filter\Contracts\ParameterFilterInterface;
 use Czim\Filter\Enums\JoinType;
 use Czim\Filter\Exceptions\FilterParameterUnhandledException;
@@ -15,7 +16,12 @@ use Illuminate\Database\Query\Builder;
 use ReflectionClass;
 use Throwable;
 
-class Filter implements Contracts\FilterInterface
+/**
+ * @template TModel of \Illuminate\Database\Eloquent\Model
+ *
+ * @implements FilterInterface<TModel>
+ */
+class Filter implements FilterInterface
 {
     public const SETTING = '_setting_';
 
@@ -43,7 +49,7 @@ class Filter implements Contracts\FilterInterface
      *      null, which means that applyParameter() will be called on the Filter
      *          itself, which MUST then be able to handle it!
      *
-     * @var array<string, ParameterFilterInterface|class-string<ParameterFilterInterface>|string|callable|null> by name
+     * @var array<string, ParameterFilterInterface<TModel>|class-string<ParameterFilterInterface<TModel>>|string|callable|null> by name
      */
     protected array $strategies = [];
 
@@ -60,7 +66,7 @@ class Filter implements Contracts\FilterInterface
      * Join memory: set join parameters for query->join() calls here, so they may be applied once and
      * without unnecessary or problematic duplication.
      *
-     * @var array<string, mixed>
+     * @var array<string, array<int, string>> keyed by identifying string/name
      */
     protected array $joins = [];
 
@@ -128,8 +134,8 @@ class Filter implements Contracts\FilterInterface
     /**
      * Applies the loaded FilterData to a query (builder).
      *
-     * @param Model|Builder|EloquentBuilder $query
-     * @return Model|Builder|EloquentBuilder
+     * @param TModel|Builder|EloquentBuilder<TModel> $query
+     * @return TModel|Builder|EloquentBuilder<TModel>
      * @throws ParameterStrategyInvalidException
      */
     public function apply(Model|Builder|EloquentBuilder $query): Model|Builder|EloquentBuilder
@@ -144,7 +150,7 @@ class Filter implements Contracts\FilterInterface
     /**
      * Applies all filter parameters to the query, using the configured strategies.
      *
-     * @param Model|Builder|EloquentBuilder $query
+     * @param TModel|Builder|EloquentBuilder<TModel> $query
      * @throws ParameterStrategyInvalidException
      */
     protected function applyParameters(Model|Builder|EloquentBuilder $query): void
@@ -182,13 +188,14 @@ class Filter implements Contracts\FilterInterface
             } elseif ($strategy === null) {
                 // Default, let it be handled by applyParameter
                 $strategy = [ $this, 'applyParameter' ];
-            } elseif (! is_callable($strategy) && ! is_array($strategy)) {
+            } elseif (! is_callable($strategy)) {
                 throw new ParameterStrategyInvalidException(
                     "Invalid strategy defined for parameter '{$parameterName}',"
                     . ' must be ParameterFilterInterface, classname, callable or null'
                 );
             }
 
+            /** @var callable $strategy */
             $strategy($parameterName, $parameterValue, $query, $this);
         }
     }
@@ -196,7 +203,7 @@ class Filter implements Contracts\FilterInterface
     /**
      * Builds up the strategies so that all instantiatable strategies are instantiated.
      *
-     * @return array<string, ParameterFilterInterface|string|callable|null> by name
+     * @return array<string, ParameterFilterInterface<TModel>|string|callable|null> by name
      * @throws ParameterStrategyInvalidException
      */
     protected function buildStrategies(): array
@@ -218,6 +225,8 @@ class Filter implements Contracts\FilterInterface
             if (! is_string($strategy) || $strategy === static::SETTING) {
                 continue;
             }
+
+            /** @var class-string<ParameterFilterInterface<TModel>> $strategy */
 
             try {
                 $reflection = new ReflectionClass($strategy);
@@ -274,9 +283,9 @@ class Filter implements Contracts\FilterInterface
      *
      * Override this if you need to use it in a specific Filter instance.
      *
-     * @param string                        $name
-     * @param mixed|null                    $value
-     * @param Model|Builder|EloquentBuilder $query
+     * @param string                                 $name
+     * @param mixed|null                             $value
+     * @param TModel|Builder|EloquentBuilder<TModel> $query
      * @throws FilterParameterUnhandledException
      */
     protected function applyParameter(string $name, mixed $value, Model|Builder|EloquentBuilder $query): void
@@ -295,9 +304,9 @@ class Filter implements Contracts\FilterInterface
     /**
      * Adds a query join to be added after all parameters are applied.
      *
-     * @param string               $key         identifying key, used to prevent duplicates
-     * @param array<string, mixed> $parameters
-     * @param string|null          $joinType   {@link JoinType} 'join'/'inner', 'right'; defaults to left join
+     * @param string             $key         identifying key, used to prevent duplicates
+     * @param array<int, string> $parameters
+     * @param string|null        $joinType   {@link JoinType} 'join'/'inner', 'right'; defaults to left join
      */
     public function addJoin(string $key, array $parameters, ?string $joinType = null): void
     {
@@ -314,12 +323,15 @@ class Filter implements Contracts\FilterInterface
         $this->joins[$key] = $parameters;
     }
 
+    /**
+     * @param Model|Builder|EloquentBuilder<TModel> $query
+     */
     protected function applyJoins(Model|Builder|EloquentBuilder $query): void
     {
         foreach ($this->joins as $key => $join) {
             $joinMethod = $this->joinTypes[ $key ] ?? static::JOIN_METHOD_LEFT;
 
-            call_user_func_array([ $query, $joinMethod ], $join);
+            $query->{$joinMethod}(...$join);
         }
     }
 
@@ -348,6 +360,10 @@ class Filter implements Contracts\FilterInterface
     }
 
 
+    /**
+     * @param array<string, mixed> $data
+     * @return FilterDataInterface
+     */
     protected function instantiateFilterData(array $data): FilterDataInterface
     {
         return new $this->filterDataClass($data);
@@ -358,7 +374,7 @@ class Filter implements Contracts\FilterInterface
      *
      * Override this to set the strategies for your filter.
      *
-     * @return array<string, ParameterFilterInterface|class-string<ParameterFilterInterface>|string|callable|null>
+     * @return array<string, ParameterFilterInterface<TModel>|class-string<ParameterFilterInterface<TModel>>|string|callable|null>
      */
     protected function strategies(): array
     {

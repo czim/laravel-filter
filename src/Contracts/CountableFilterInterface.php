@@ -4,6 +4,11 @@ namespace Czim\Filter\Contracts;
 
 use Czim\Filter\CountableResults;
 
+/**
+ * @template TModel of \Illuminate\Database\Eloquent\Model
+ *
+ * @extends FilterInterface<TModel>
+ */
 interface CountableFilterInterface extends FilterInterface
 {
     /**
@@ -17,7 +22,7 @@ interface CountableFilterInterface extends FilterInterface
      * Gets alternative counts per (relevant) attribute for the filter data.
      *
      * @param string[] $countables when provided, limits the result to theses countables
-     * @return CountableResults
+     * @return CountableResults<string, mixed>
      */
     public function getCounts(array $countables = []): CountableResults;
 

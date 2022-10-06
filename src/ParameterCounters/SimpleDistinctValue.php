@@ -14,6 +14,10 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * Counts different distinct values for a single column with configurable aliases.
+ *
+ * @template TModel of \Illuminate\Database\Eloquent\Model
+ *
+ * @implements ParameterCounterInterface<TModel>
  */
 class SimpleDistinctValue implements ParameterCounterInterface
 {
@@ -36,9 +40,9 @@ class SimpleDistinctValue implements ParameterCounterInterface
     /**
      * Returns the count for a countable parameter, given the query provided.
      *
-     * @param string                        $name
-     * @param Model|Builder|EloquentBuilder $query
-     * @param CountableFilterInterface      $filter
+     * @param string                                 $name
+     * @param TModel|Builder|EloquentBuilder<TModel> $query
+     * @param CountableFilterInterface<TModel>       $filter
      * @return Collection<string, int>
      */
     public function count(

@@ -4,6 +4,9 @@ namespace Czim\Filter\Contracts;
 
 use Illuminate\Contracts\Support\Arrayable;
 
+/**
+ * @extends Arrayable<string, mixed>
+ */
 interface FilterDataInterface extends Arrayable
 {
     /**

@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Str;
+use Stringable;
 
 /**
  * Simple string comparison for a single column on a translated attribute.
@@ -23,6 +24,10 @@ use Illuminate\Support\Str;
  * Standard Laravel conventions are required for this to work, so the
  * translated table `<something>`.`id` should be referred to in the foreign key
  * on the translations table as something_translations.something_id.
+ *
+ * @template TModel of \Illuminate\Database\Eloquent\Model
+ *
+ * @implements ParameterFilterInterface<TModel>
  */
 class SimpleTranslatedString implements ParameterFilterInterface
 {
@@ -64,6 +69,13 @@ class SimpleTranslatedString implements ParameterFilterInterface
         $this->exact            = $exact;
     }
 
+    /**
+     * @param string                                 $name
+     * @param string|Stringable                      $value
+     * @param TModel|Builder|EloquentBuilder<TModel> $query
+     * @param FilterInterface<TModel>                $filter
+     * @return TModel|Builder|EloquentBuilder<TModel>
+     */
     public function apply(
         string $name,
         mixed $value,

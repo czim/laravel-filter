@@ -8,6 +8,8 @@ use MyCLabs\Enum\Enum;
 
 /**
  * Unique identifiers for standard join parameter-sets in filters
+ *
+ * @extends Enum<string>
  */
 class JoinKey extends Enum
 {

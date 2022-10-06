@@ -13,6 +13,10 @@ use Illuminate\Database\Query\Builder;
 /**
  * Simple string comparison on a single column.
  * LIKE/loosy by default, but can be forced to be an exact match.
+ *
+ * @template TModel of \Illuminate\Database\Eloquent\Model
+ *
+ * @implements ParameterFilterInterface<TModel>
  */
 class SimpleString implements ParameterFilterInterface
 {
@@ -28,6 +32,13 @@ class SimpleString implements ParameterFilterInterface
     ) {
     }
 
+    /**
+     * @param string                                 $name
+     * @param mixed                                  $value
+     * @param TModel|Builder|EloquentBuilder<TModel> $query
+     * @param FilterInterface<TModel>                $filter
+     * @return TModel|Builder|EloquentBuilder<TModel>
+     */
     public function apply(
         string $name,
         mixed $value,
