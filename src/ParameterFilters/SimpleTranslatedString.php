@@ -34,7 +34,7 @@ class SimpleTranslatedString implements ParameterFilterInterface
     protected const TRANSLATION_TABLE_POSTFIX = '_translations';
 
     protected string $table;
-    protected ?string $translationTable;
+    protected string $translationTable;
     protected ?string $column;
     protected string $locale;
     protected bool $exact;
@@ -108,7 +108,7 @@ class SimpleTranslatedString implements ParameterFilterInterface
         return 'like';
     }
 
-    protected function makeValueToCompare(mixed $value): string
+    protected function makeValueToCompare(string|Stringable $value): string
     {
         if ($this->exact) {
             return (string) $value;
