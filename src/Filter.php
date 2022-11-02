@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Czim\Filter;
 
+use Closure;
 use Czim\Filter\Contracts\FilterDataInterface;
 use Czim\Filter\Contracts\FilterInterface;
 use Czim\Filter\Contracts\ParameterFilterInterface;
@@ -66,7 +67,7 @@ class Filter implements FilterInterface
      * Join memory: set join parameters for query->join() calls here, so they may be applied once and
      * without unnecessary or problematic duplication.
      *
-     * @var array<string, array<int, string>> keyed by identifying string/name
+     * @var array<string, array<int, string|Closure>> keyed by identifying string/name
      */
     protected array $joins = [];
 
@@ -304,9 +305,9 @@ class Filter implements FilterInterface
     /**
      * Adds a query join to be added after all parameters are applied.
      *
-     * @param string             $key         identifying key, used to prevent duplicates
-     * @param array<int, string> $parameters
-     * @param string|null        $joinType   {@link JoinType} 'join'/'inner', 'right'; defaults to left join
+     * @param string                     $key         identifying key, used to prevent duplicates
+     * @param array<int, string|Closure> $parameters  [...string] or [string, Closure]
+     * @param string|null                $joinType   {@link JoinType} 'join'/'inner', 'right'; defaults to left join
      */
     public function addJoin(string $key, array $parameters, ?string $joinType = null): void
     {
