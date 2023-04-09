@@ -1,5 +1,9 @@
 # Changelog
 
+### [5.0.0] - 2023-04-09
+
+Laravel 10 upgrade.
+
 ### [4.0.0] - 2022-10-06
 
 Now requires PHP 8.1 and Laravel 9 (at minimum).
