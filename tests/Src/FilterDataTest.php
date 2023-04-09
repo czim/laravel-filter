@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Czim\Filter\Test;
+namespace Czim\Filter\Test\Src;
 
 use Czim\Filter\Contracts\FilterDataInterface;
 use Czim\Filter\Exceptions\FilterDataValidationFailedException;
 use Czim\Filter\Test\Helpers\TestFilterData;
+use Czim\Filter\Test\TestCase;
 
 class FilterDataTest extends TestCase
 {

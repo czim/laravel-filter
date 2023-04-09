@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Czim\Filter\Test;
+namespace Czim\Filter\Test\Src;
 
 use Czim\Filter\Contracts\CountableFilterInterface;
 use Czim\Filter\Test\Helpers\Models\TestRelatedModel;
 use Czim\Filter\Test\Helpers\Models\TestSimpleModel;
 use Czim\Filter\Test\Helpers\TestCountableFilter;
+use Czim\Filter\Test\TestCase;
 
 class CountableFilterTest extends TestCase
 {
